@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
+  <!-- Outer border -->
+  <rect x="2" y="2" width="44" height="44" rx="8" stroke="#171717" stroke-width="1.5" stroke-opacity="0.25"/>
+  <!-- Warung Roof / Awning Facade (Geometric Canopy) -->
+  <path d="M6 15L24 6L42 15H6Z" fill="#171717"/>
+  <!-- Awning Accent -->
+  <rect x="6" y="15" width="36" height="3" rx="1" fill="#171717"/>
+  <!-- 'P' Monogram Stem & Counter -->
+  <rect x="11" y="19" width="3.5" height="22" rx="1" fill="#171717"/>
+  <path d="M14.5 19H21C23.2 19 25 20.8 25 23V25C25 27.2 23.2 29 21 29H14.5V19Z" stroke="#171717" stroke-width="3.2" stroke-linejoin="round"/>
+  <!-- 'A' Monogram Arch & Shelf -->
+  <path d="M26 41L32 19L38 41" stroke="#171717" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M28.5 33H35.5" stroke="#171717" stroke-width="3" stroke-linecap="round"/>
+  <!-- Base threshold -->
+  <rect x="8" y="41" width="32" height="2.5" rx="1" fill="#171717"/>
+</svg>

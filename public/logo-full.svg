@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 60" width="360" height="60" fill="none">
+  <!-- Symbol (48x48 centered at x=6, y=6) -->
+  <g transform="translate(6, 6)">
+    <rect x="2" y="2" width="44" height="44" rx="8" stroke="#171717" stroke-width="1.5" stroke-opacity="0.2"/>
+    <path d="M6 15L24 6L42 15H6Z" fill="#171717"/>
+    <rect x="6" y="15" width="36" height="3" rx="1" fill="#171717"/>
+    <rect x="11" y="19" width="3.5" height="22" rx="1" fill="#171717"/>
+    <path d="M14.5 19H21C23.2 19 25 20.8 25 23V25C25 27.2 23.2 29 21 29H14.5V19Z" stroke="#171717" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="M26 41L32 19L38 41" stroke="#171717" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M28.5 33H35.5" stroke="#171717" stroke-width="3" stroke-linecap="round"/>
+    <rect x="8" y="41" width="32" height="2.5" rx="1" fill="#171717"/>
+  </g>
+  <!-- Typography -->
+  <text x="68" y="28" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="800" font-size="18" fill="#171717" letter-spacing="0.05em">WARUNG POJOK ARO</text>
+  <text x="68" y="46" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="500" font-size="11" fill="#6B7280" letter-spacing="0.01em">Menyediakan Kebutuhan Harian Anda</text>
+</svg>

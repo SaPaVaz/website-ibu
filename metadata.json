@@ -1,0 +1,8 @@
+{
+  "name": "Remix Warung Pojok Aro",
+  "description": "Website profil resmi Warung Pojok Aro di Wonosobo. Menyediakan sembako, makanan, minuman, snack ringan, alat tulis, pakan hewan, aksesori, dan layanan mini ATM.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
