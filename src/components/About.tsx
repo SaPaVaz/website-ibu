@@ -60,19 +60,19 @@ export const About: React.FC = () => {
 
             <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-heading">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#97A87A] dark:text-[#A8BBA3] shrink-0" />
                 <span>Stok Sembako & Es Krim Lengkap</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#97A87A] dark:text-[#A8BBA3] shrink-0" />
                 <span>Alat Tulis & Fotokopi/Print</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#97A87A] dark:text-[#A8BBA3] shrink-0" />
                 <span>Perlengkapan Mandi & Cuci</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#97A87A] dark:text-[#A8BBA3] shrink-0" />
                 <span>Layanan Transaksi Mini ATM</span>
               </div>
             </div>

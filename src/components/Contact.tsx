@@ -41,14 +41,14 @@ export const Contact: React.FC = () => {
                 aria-label="Salin nomor WhatsApp"
               >
                 {copied ? (
-                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <Check className="w-4 h-4 text-[#97A87A] dark:text-[#A8BBA3]" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
               </button>
             </div>
             {copied && (
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+              <p className="text-xs text-[#97A87A] dark:text-[#A8BBA3] mt-1">
                 Nomor WhatsApp berhasil disalin
               </p>
             )}

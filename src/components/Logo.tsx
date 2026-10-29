@@ -56,7 +56,7 @@ export const Logo: React.FC<LogoProps> = ({
             Warung Pojok Aro
           </span>
           {showSlogan && (
-            <span className="block text-[10px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase mt-0.5">
+            <span className="block text-[10px] sm:text-xs font-semibold text-[#97A87A] dark:text-[#A8BBA3] tracking-wider uppercase mt-0.5">
               Toko Serba Ada &bull; Kebutuhan Harian
             </span>
           )}
@@ -75,7 +75,7 @@ export const Logo: React.FC<LogoProps> = ({
         </span>
         {showSlogan && (
           <span className="text-[9.5px] xs:text-[10px] sm:text-[11px] font-medium text-muted tracking-tight select-none mt-0.5 flex items-center gap-1.5 truncate">
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">
+            <span className="font-semibold text-[#97A87A] dark:text-[#A8BBA3] shrink-0">
               Toko Serba Ada
             </span>
             <span className="opacity-60 shrink-0">&bull;</span>

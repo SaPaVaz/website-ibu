@@ -39,12 +39,12 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme }) => {
           >
             {theme === 'dark' ? (
               <>
-                <Sun className="w-4 h-4 text-amber-400" />
+                <Sun className="w-4 h-4 text-[#DB9558]" />
                 <span className="hidden sm:inline">Mode Terang</span>
               </>
             ) : (
               <>
-                <Moon className="w-4 h-4 text-neutral-600" />
+                <Moon className="w-4 h-4 text-[#97A87A]" />
                 <span className="hidden sm:inline">Mode Gelap</span>
               </>
             )}

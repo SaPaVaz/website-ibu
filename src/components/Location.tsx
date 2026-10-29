@@ -71,7 +71,7 @@ export const Location: React.FC = () => {
                 >
                   {copied ? (
                     <>
-                      <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <Check className="w-4 h-4 text-[#97A87A] dark:text-[#A8BBA3]" />
                       <span>Alamat Tersalin</span>
                     </>
                   ) : (

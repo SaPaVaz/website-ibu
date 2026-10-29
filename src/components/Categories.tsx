@@ -89,11 +89,11 @@ export const Categories: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className="group relative flex flex-col justify-between p-5 sm:p-6 rounded-xl border border-theme bg-card-theme transition-all duration-200 hover:border-neutral-400 dark:hover:border-neutral-600 hover:-translate-y-0.5"
+                className="group relative flex flex-col justify-between p-4 sm:p-5 lg:p-6 rounded-xl border border-theme bg-card-theme transition-all duration-200 hover:border-[#DB9558] hover:shadow-md hover:-translate-y-0.5"
               >
                 <div>
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg border border-theme bg-surface flex items-center justify-center text-heading mb-4 sm:mb-5 transition-colors group-hover:border-neutral-400">
-                    <IconComponent className="w-5 h-5" />
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg border border-theme bg-surface flex items-center justify-center text-heading mb-4 sm:mb-5 transition-colors group-hover:border-[#DB9558] group-hover:text-[#DB9558]">
+                    <IconComponent className="w-5 h-5 transition-colors" />
                   </div>
                   <h3 className="text-base sm:text-lg font-semibold text-heading tracking-tight">
                     {item.title}

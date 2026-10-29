@@ -76,8 +76,8 @@ export const OpeningHours: React.FC = () => {
               <span className="relative flex h-3.5 w-3.5">
                 {isOpen ? (
                   <>
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#97A87A] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#97A87A]" />
                   </>
                 ) : (
                   <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-neutral-400" />
