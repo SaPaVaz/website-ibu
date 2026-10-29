@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
                 <span>Alamat</span>
               </div>
               <p className="text-xs sm:text-sm text-heading leading-relaxed">
-                Kleyang Jurang, Pungangan, Mojotengah, Wonosobo
+                Kleyang Jurang RT 07/RW 01, Kleang Jurang, Pungangan, Kecamatan Mojotengah, Kabupaten Wonosobo, Jawa Tengah 56351.
               </p>
             </div>
 
