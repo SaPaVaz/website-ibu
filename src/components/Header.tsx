@@ -1,7 +1,8 @@
 import React from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Lock, LogOut, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Logo } from './Logo';
+import { useAuth } from '../context/AuthContext';
 
 interface HeaderProps {
   theme: 'light' | 'dark';
@@ -10,6 +11,9 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onReplayIntro }) => {
+  const { isAuthenticated, isAdmin, isMember, openLoginModal, openLogoutModal, openAdminPanel, openMemberModal } =
+    useAuth();
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -36,10 +40,64 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onReplayIn
           </div>
         </button>
 
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <span className="hidden md:inline-block px-2.5 py-0.5 text-xs font-medium rounded-full border border-theme text-muted">
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <span className="hidden lg:inline-block px-2.5 py-0.5 text-xs font-medium rounded-full border border-theme text-muted">
             Profil Resmi
           </span>
+
+          {/* User Session status */}
+          {!isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => openLoginModal('login')}
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-theme text-heading hover:border-[#DB9558] hover:text-[#DB9558] transition-all text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#DB9558] cursor-pointer"
+              title="Masuk atau Daftar Akun Warung Pojok Aro"
+              aria-label="Masuk atau Daftar"
+            >
+              <Lock className="w-3.5 h-3.5 text-[#DB9558]" />
+              <span className="hidden xs:inline">Masuk</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {isAdmin ? (
+                <button
+                  type="button"
+                  onClick={openAdminPanel}
+                  className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#97A87A]/50 bg-[#97A87A]/15 text-heading hover:bg-[#97A87A]/25 transition-all text-xs sm:text-sm font-semibold cursor-pointer shadow-2xs"
+                  title="Buka Panel Admin"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#97A87A] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#97A87A]" />
+                  </span>
+                  <span>Admin</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={openMemberModal}
+                  className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#DB9558]/50 bg-[#DB9558]/15 text-[#DB9558] hover:bg-[#DB9558]/25 transition-all text-xs sm:text-sm font-semibold cursor-pointer shadow-2xs"
+                  title="Buka Portal Member"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>Member</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={openLogoutModal}
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-red-300 dark:border-red-800/80 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all text-xs sm:text-sm font-semibold cursor-pointer shadow-2xs"
+                title="Keluar dari akun (Logout)"
+                aria-label="Logout"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
+
+          {/* Theme Toggle Button */}
           <button
             type="button"
             onClick={onToggleTheme}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, Clock, MessageCircle } from 'lucide-react';
 import { Logo } from './Logo';
+import { useAuth } from '../context/AuthContext';
 
 interface FooterProps {
   onReplayIntro?: () => void;
@@ -8,6 +9,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
   const currentYear = new Date().getFullYear();
+  const { isAuthenticated, isAdmin, openLoginModal, openAdminPanel, openMemberModal } = useAuth();
 
   return (
     <footer className="w-full bg-page border-t border-theme transition-colors">
@@ -58,12 +60,12 @@ export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
           </div>
         </div>
 
-        {/* Copyright & Replay Intro */}
+        {/* Copyright & Quick Links */}
         <div className="mt-12 pt-8 border-t border-theme flex flex-col sm:flex-row items-center justify-between text-xs text-muted gap-4">
           <p>
             &copy; {currentYear} Warung Pojok Aro. Hak Cipta Dilindungi.
           </p>
-          <div className="flex items-center gap-4 text-[11px]">
+          <div className="flex items-center gap-3 sm:gap-4 text-[11px] flex-wrap justify-center">
             {onReplayIntro && (
               <button
                 type="button"
@@ -71,7 +73,36 @@ export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
                 className="hover:text-[#DB9558] transition-colors cursor-pointer"
                 title="Tampilkan kembali animasi sambutan"
               >
-                Putar Animasi Sambutan
+                Putar Animasi
+              </button>
+            )}
+            <span>&bull;</span>
+            {!isAuthenticated ? (
+              <button
+                type="button"
+                onClick={() => openLoginModal('login')}
+                className="hover:text-[#DB9558] transition-colors cursor-pointer"
+                title="Masuk atau Daftar Akun"
+              >
+                Masuk / Daftar Akun
+              </button>
+            ) : isAdmin ? (
+              <button
+                type="button"
+                onClick={openAdminPanel}
+                className="text-[#97A87A] dark:text-[#A8BBA3] hover:underline font-semibold transition-colors cursor-pointer"
+                title="Buka panel admin"
+              >
+                Panel Admin
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={openMemberModal}
+                className="text-[#DB9558] hover:underline font-semibold transition-colors cursor-pointer"
+                title="Buka portal member"
+              >
+                Portal Member
               </button>
             )}
             <span>&bull;</span>
