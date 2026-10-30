@@ -2,7 +2,11 @@ import React from 'react';
 import { MapPin, Clock, MessageCircle } from 'lucide-react';
 import { Logo } from './Logo';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onReplayIntro?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -54,14 +58,25 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Copyright */}
+        {/* Copyright & Replay Intro */}
         <div className="mt-12 pt-8 border-t border-theme flex flex-col sm:flex-row items-center justify-between text-xs text-muted gap-4">
           <p>
             &copy; {currentYear} Warung Pojok Aro. Hak Cipta Dilindungi.
           </p>
-          <p className="text-[11px]">
-            Profil Bisnis Resmi &bull; Mojotengah, Wonosobo, Jawa Tengah
-          </p>
+          <div className="flex items-center gap-4 text-[11px]">
+            {onReplayIntro && (
+              <button
+                type="button"
+                onClick={onReplayIntro}
+                className="hover:text-[#DB9558] transition-colors cursor-pointer"
+                title="Tampilkan kembali animasi sambutan"
+              >
+                Putar Animasi Sambutan
+              </button>
+            )}
+            <span>&bull;</span>
+            <span>Mojotengah, Wonosobo, Jawa Tengah</span>
+          </div>
         </div>
       </div>
     </footer>

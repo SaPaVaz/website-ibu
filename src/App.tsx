@@ -7,8 +7,10 @@ import { OpeningHours } from './components/OpeningHours';
 import { Location } from './components/Location';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
+import { IntroSplash } from './components/IntroSplash';
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('warung_pojok_aro_theme');
@@ -41,7 +43,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-page text-heading transition-colors duration-200">
-      <Header theme={theme} onToggleTheme={toggleTheme} />
+      {/* Opening Welcome Animation */}
+      {showIntro && <IntroSplash onFinish={() => setShowIntro(false)} />}
+
+      <Header theme={theme} onToggleTheme={toggleTheme} onReplayIntro={() => setShowIntro(true)} />
       <main className="flex-grow">
         <Hero />
         <Categories />
@@ -50,7 +55,7 @@ export default function App() {
         <Location />
         <Contact />
       </main>
-      <Footer />
+      <Footer onReplayIntro={() => setShowIntro(true)} />
     </div>
   );
 }

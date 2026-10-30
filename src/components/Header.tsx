@@ -5,16 +5,20 @@ import { Logo } from './Logo';
 interface HeaderProps {
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  onReplayIntro?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme }) => {
+export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onReplayIntro }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-theme bg-page/90 backdrop-blur-md transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-18 flex items-center justify-between gap-3">
-        <a
-          href="#"
-          className="flex items-center min-w-0 focus:outline-none focus:ring-2 focus:ring-neutral-400 rounded-lg p-1 -ml-1"
-          aria-label="Warung Pojok Aro Beranda"
+        <button
+          type="button"
+          onClick={() => {
+            if (onReplayIntro) onReplayIntro();
+          }}
+          className="flex items-center min-w-0 text-left focus:outline-none focus:ring-2 focus:ring-[#DB9558] rounded-lg p-1 -ml-1 cursor-pointer"
+          aria-label="Warung Pojok Aro Beranda - Putar Animasi Sambutan"
         >
           {/* Mobile phone: compact logo with title */}
           <div className="sm:hidden">
@@ -24,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme }) => {
           <div className="hidden sm:block">
             <Logo size="md" showSlogan={true} />
           </div>
-        </a>
+        </button>
 
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <span className="hidden md:inline-block px-2.5 py-0.5 text-xs font-medium rounded-full border border-theme text-muted">
