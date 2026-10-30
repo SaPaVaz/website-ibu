@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MapPin, ExternalLink, Copy, Check } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export const Location: React.FC = () => {
   const [copied, setCopied] = useState(false);
@@ -17,9 +18,15 @@ export const Location: React.FC = () => {
   };
 
   return (
-    <section className="w-full py-16 sm:py-20 border-b border-theme bg-page transition-colors">
+    <section className="w-full py-16 sm:py-20 border-b border-theme bg-page transition-colors overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="max-w-2xl mb-10 sm:mb-14">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-2xl mb-10 sm:mb-14"
+        >
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted mb-2">
             <MapPin className="w-4 h-4" />
             <span>Petunjuk Lokasi</span>
@@ -27,11 +34,17 @@ export const Location: React.FC = () => {
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-heading">
             Lokasi Warung
           </h2>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Address Details Card */}
-          <div className="lg:col-span-6 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, x: -25 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-6 space-y-6"
+          >
             <div className="rounded-2xl border border-theme bg-card-theme p-6 sm:p-8 space-y-6 shadow-xs">
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-2">
@@ -67,7 +80,7 @@ export const Location: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="btn-secondary inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium"
+                  className="btn-secondary inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium cursor-pointer"
                 >
                   {copied ? (
                     <>
@@ -83,10 +96,16 @@ export const Location: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Interactive Map Embed */}
-          <div className="lg:col-span-6 w-full">
+          <motion.div
+            initial={{ opacity: 0, x: 25 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+            className="lg:col-span-6 w-full"
+          >
             <div className="rounded-2xl overflow-hidden border border-theme bg-surface shadow-xs">
               <div className="p-3 border-b border-theme flex items-center justify-between text-xs text-muted">
                 <span className="font-medium text-heading">Peta Wilayah Mojotengah, Wonosobo</span>
@@ -105,7 +124,7 @@ export const Location: React.FC = () => {
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

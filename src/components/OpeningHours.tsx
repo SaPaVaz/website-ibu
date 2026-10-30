@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle2, CircleOff } from 'lucide-react';
+import { Clock } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface DaySchedule {
   day: string;
@@ -56,9 +57,15 @@ export const OpeningHours: React.FC = () => {
   }, []);
 
   return (
-    <section className="w-full py-16 sm:py-20 border-b border-theme bg-surface transition-colors">
+    <section className="w-full py-16 sm:py-20 border-b border-theme bg-surface transition-colors overflow-hidden">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="max-w-2xl mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-2xl mb-10"
+        >
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted mb-2">
             <Clock className="w-4 h-4" />
             <span>Jadwal Buka</span>
@@ -66,10 +73,16 @@ export const OpeningHours: React.FC = () => {
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-heading">
             Jam Operasional
           </h2>
-        </div>
+        </motion.div>
 
-        {/* Status Card & Schedule Box */}
-        <div className="rounded-2xl border border-theme bg-card-theme p-6 sm:p-8 shadow-xs">
+        {/* Status Card & Schedule Box with entrance animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="rounded-2xl border border-theme bg-card-theme p-6 sm:p-8 shadow-xs"
+        >
           {/* Real-time Status Banner */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-theme gap-4">
             <div className="flex items-center gap-3">
@@ -116,7 +129,7 @@ export const OpeningHours: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-sm sm:text-base">{item.day}</span>
                     {isToday && (
-                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-md border border-theme bg-surface text-heading">
+                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-md border border-[#97A87A]/40 bg-[#97A87A]/15 text-heading">
                         Hari Ini
                       </span>
                     )}
@@ -128,7 +141,7 @@ export const OpeningHours: React.FC = () => {
               );
             })}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

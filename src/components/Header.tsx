@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Logo } from './Logo';
 
 interface HeaderProps {
@@ -10,14 +11,19 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onReplayIntro }) => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-theme bg-page/90 backdrop-blur-md transition-colors">
+    <motion.header
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="sticky top-0 z-40 w-full border-b border-theme bg-page/90 backdrop-blur-md transition-colors"
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-18 flex items-center justify-between gap-3">
         <button
           type="button"
           onClick={() => {
             if (onReplayIntro) onReplayIntro();
           }}
-          className="flex items-center min-w-0 text-left focus:outline-none focus:ring-2 focus:ring-[#DB9558] rounded-lg p-1 -ml-1 cursor-pointer"
+          className="flex items-center min-w-0 text-left focus:outline-none focus:ring-2 focus:ring-[#DB9558] rounded-lg p-1 -ml-1 cursor-pointer transition-transform duration-200 active:scale-95"
           aria-label="Warung Pojok Aro Beranda - Putar Animasi Sambutan"
         >
           {/* Mobile phone: compact logo with title */}
@@ -39,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onReplayIn
             onClick={onToggleTheme}
             aria-label={theme === 'dark' ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
             title={theme === 'dark' ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
-            className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg border border-theme text-heading hover:bg-surface transition-all text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-neutral-400"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg border border-theme text-heading hover:bg-surface transition-all text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#DB9558] cursor-pointer"
           >
             {theme === 'dark' ? (
               <>
@@ -55,6 +61,6 @@ export const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onReplayIn
           </button>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 };

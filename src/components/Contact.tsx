@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export const Contact: React.FC = () => {
   const [copied, setCopied] = useState(false);
@@ -13,18 +14,31 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section className="w-full py-16 sm:py-20 border-b border-theme bg-surface transition-colors">
+    <section className="w-full py-16 sm:py-20 border-b border-theme bg-surface transition-colors overflow-hidden">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-        <div className="max-w-2xl mx-auto space-y-4 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-2xl mx-auto space-y-4 mb-8"
+        >
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-heading">
             Hubungi Kami
           </h2>
           <p className="text-base sm:text-lg text-muted leading-relaxed">
             Untuk informasi mengenai produk dan layanan yang tersedia, silakan hubungi Warung Pojok Aro melalui WhatsApp.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="rounded-2xl border border-theme bg-card-theme p-8 sm:p-10 max-w-xl mx-auto shadow-xs space-y-6">
+        {/* Animated Contact Card */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94, y: 24 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="rounded-2xl border border-theme bg-card-theme p-8 sm:p-10 max-w-xl mx-auto shadow-xs space-y-6"
+        >
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-muted block mb-1">
               Nomor WhatsApp
@@ -37,7 +51,7 @@ export const Contact: React.FC = () => {
                 type="button"
                 onClick={handleCopyNumber}
                 title="Salin nomor WhatsApp"
-                className="p-2 rounded-lg border border-theme hover:bg-surface text-muted hover:text-heading transition-colors"
+                className="p-2 rounded-lg border border-theme hover:bg-surface text-muted hover:text-heading transition-colors cursor-pointer"
                 aria-label="Salin nomor WhatsApp"
               >
                 {copied ? (
@@ -48,7 +62,7 @@ export const Contact: React.FC = () => {
               </button>
             </div>
             {copied && (
-              <p className="text-xs text-[#97A87A] dark:text-[#A8BBA3] mt-1">
+              <p className="text-xs text-[#97A87A] dark:text-[#A8BBA3] mt-1 font-medium">
                 Nomor WhatsApp berhasil disalin
               </p>
             )}
@@ -73,7 +87,7 @@ export const Contact: React.FC = () => {
               <span>Hubungi via WhatsApp</span>
             </a>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
