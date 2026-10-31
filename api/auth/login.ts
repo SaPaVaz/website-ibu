@@ -42,10 +42,12 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
 
   const authResult = authenticate(email, password);
 
-  if (!authResult) {
-    return res.status(401).json({
+  if (!authResult.success) {
+    const statusCode = authResult.reason === 'NOT_REGISTERED' ? 404 : 401;
+    return res.status(statusCode).json({
       success: false,
-      message: 'Incorrect email or password. Please try again.',
+      reason: authResult.reason,
+      message: authResult.message,
     });
   }
 

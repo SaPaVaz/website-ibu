@@ -67,10 +67,12 @@ router.post('/login', (req: Request, res: Response) => {
 
   const authResult = authenticate(email, password);
 
-  if (!authResult) {
-    return res.status(401).json({
+  if (!authResult.success) {
+    const statusCode = authResult.reason === 'NOT_REGISTERED' ? 404 : 401;
+    return res.status(statusCode).json({
       success: false,
-      message: 'Incorrect email or password. Please try again.',
+      reason: authResult.reason,
+      message: authResult.message,
     });
   }
 
@@ -133,7 +135,7 @@ router.get('/users', (req: Request, res: Response) => {
   });
 });
 
-// PATCH /api/auth/users/:id/role (Super Admin & Admin: change member <-> admin)
+// PATCH /api/auth/users/:id/role (Super Admin & Admin: change role)
 router.patch('/users/:id/role', (req: Request, res: Response) => {
   const token = extractToken(req);
   if (!token) {
@@ -146,17 +148,21 @@ router.patch('/users/:id/role', (req: Request, res: Response) => {
   }
 
   const userId = req.params.id;
-  const { role } = req.body as { role: 'admin' | 'member' };
+  const { role } = req.body as { role: 'superadmin' | 'admin' | 'member' };
 
-  if (role !== 'admin' && role !== 'member') {
-    return res.status(400).json({ success: false, message: 'Role must be admin or member.' });
+  if (role !== 'superadmin' && role !== 'admin' && role !== 'member') {
+    return res.status(400).json({ success: false, message: 'Role must be superadmin, admin, or member.' });
   }
 
-  const updated = updateUserRole(userId, role);
+  if (role === 'superadmin' && requester.role !== 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Only Super Admin can promote a user to Super Admin.' });
+  }
+
+  const updated = updateUserRole(userId, role, requester.role);
   if (!updated) {
     return res.status(400).json({
       success: false,
-      message: 'Cannot modify Super Admin or user not found.',
+      message: 'Cannot modify primary Super Admin or user not found.',
     });
   }
 

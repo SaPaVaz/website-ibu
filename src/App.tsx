@@ -63,7 +63,7 @@ function MainApp() {
 
   // 2. Gateway protection: when not authenticated, show the dedicated Auth Gateway Screen
   if (!isAuthenticated) {
-    return <AuthGatewayScreen />;
+    return <AuthGatewayScreen theme={theme} onToggleTheme={toggleTheme} />;
   }
 
   // 3. Authenticated: enter the full Beranda Website

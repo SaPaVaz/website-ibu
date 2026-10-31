@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { authService, UserProfile } from '../services/auth';
+import { authService, UserProfile, UserRole } from '../services/auth';
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -8,7 +8,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isMember: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; reason?: string }>;
   signup: (name: string, email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
   changePassword: (oldPass: string, newPass: string) => Promise<{ success: boolean; message: string }>;
@@ -27,7 +27,7 @@ interface AuthContextType {
   closeMemberModal: () => void;
   usersList: UserProfile[];
   refreshUsers: () => Promise<void>;
-  changeUserRole: (userId: string, newRole: 'admin' | 'member') => Promise<{ success: boolean; message?: string }>;
+  changeUserRole: (userId: string, newRole: UserRole) => Promise<{ success: boolean; message?: string }>;
   deleteUserAccount: (userId: string) => Promise<{ success: boolean; message?: string }>;
 }
 
@@ -84,9 +84,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (result.success && result.user) {
         setUser(result.user);
         setIsLoginModalOpen(false);
+        refreshUsers();
         return { success: true, message: result.message };
       }
-      return { success: false, message: result.message || 'Login failed.' };
+      return { success: false, reason: result.reason, message: result.message || 'Login failed.' };
     } finally {
       setIsLoading(false);
     }
@@ -99,6 +100,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (result.success && result.user) {
         setUser(result.user);
         setIsLoginModalOpen(false);
+        refreshUsers();
         return { success: true, message: result.message };
       }
       return { success: false, message: result.message || 'Sign up failed.' };
@@ -124,7 +126,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return await authService.changePassword(oldPass, newPass);
   };
 
-  const changeUserRole = async (userId: string, newRole: 'admin' | 'member') => {
+  const changeUserRole = async (userId: string, newRole: UserRole) => {
     const res = await authService.updateUserRole(userId, newRole);
     if (res.success) {
       if (res.users) {
@@ -179,7 +181,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         openLogoutModal: () => setIsLogoutModalOpen(true),
         closeLogoutModal: () => setIsLogoutModalOpen(false),
         isAdminPanelOpen,
-        openAdminPanel: () => setIsAdminPanelOpen(true),
+        openAdminPanel: () => {
+          refreshUsers();
+          setIsAdminPanelOpen(true);
+        },
         closeAdminPanel: () => setIsAdminPanelOpen(false),
         isMemberModalOpen,
         openMemberModal: () => setIsMemberModalOpen(true),

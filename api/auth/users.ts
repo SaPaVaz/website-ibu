@@ -42,12 +42,15 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
 
   if (req.method === 'PATCH') {
     const { userId, role } = req.body || {};
-    if (!userId || (role !== 'admin' && role !== 'member')) {
-      return res.status(400).json({ success: false, message: 'Role must be admin or member.' });
+    if (!userId || (role !== 'superadmin' && role !== 'admin' && role !== 'member')) {
+      return res.status(400).json({ success: false, message: 'Role must be superadmin, admin, or member.' });
     }
-    const updated = updateUserRole(userId, role);
+    if (role === 'superadmin' && requester.role !== 'superadmin') {
+      return res.status(403).json({ success: false, message: 'Only Super Admin can promote a user to Super Admin.' });
+    }
+    const updated = updateUserRole(userId, role, requester.role);
     if (!updated) {
-      return res.status(400).json({ success: false, message: 'Cannot modify Super Admin or user not found.' });
+      return res.status(400).json({ success: false, message: 'Cannot modify primary Super Admin or user not found.' });
     }
     return res.status(200).json({ success: true, message: `User role updated to ${role}.`, users: getAllUsers() });
   }

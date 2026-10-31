@@ -216,20 +216,34 @@ export function registerUser(
   };
 }
 
+export type AuthResult =
+  | { success: true; user: SafeUser; token: string }
+  | { success: false; reason: 'NOT_REGISTERED' | 'INVALID_PASSWORD' | 'MISSING_FIELDS'; message: string };
+
 /**
  * Authenticate login credentials
  */
 export function authenticate(
   email: string,
   password: string
-): { user: SafeUser; token: string } | null {
-  if (!email || !password) return null;
+): AuthResult {
+  if (!email || !password) {
+    return {
+      success: false,
+      reason: 'MISSING_FIELDS',
+      message: 'Email and password are required.',
+    };
+  }
 
   const normalizedEmail = email.trim().toLowerCase();
   const existingUser = usersStore.get(normalizedEmail);
 
   if (!existingUser) {
-    return null;
+    return {
+      success: false,
+      reason: 'NOT_REGISTERED',
+      message: 'This email is not registered yet. Please sign up first.',
+    };
   }
 
   const computedHash = hashPassword(password, existingUser.salt);
@@ -249,7 +263,11 @@ export function authenticate(
   }
 
   if (!isPasswordValid) {
-    return null;
+    return {
+      success: false,
+      reason: 'INVALID_PASSWORD',
+      message: 'Incorrect password. Please try again.',
+    };
   }
 
   const token = signToken({
@@ -259,6 +277,7 @@ export function authenticate(
   });
 
   return {
+    success: true,
     user: toSafeUser(existingUser),
     token,
   };
@@ -291,14 +310,24 @@ export function getAllUsers(): SafeUser[] {
 }
 
 /**
- * Update user role: only between 'admin' and 'member'
- * Super Admin cannot be downgraded, and other users cannot become super admin!
+ * Update user role:
+ * - Only Super Admin can promote someone to 'superadmin'
+ * - Regular Admin can only toggle between 'admin' and 'member'
+ * - Primary owner (safarazqiaa@gmail.com) is permanently protected
  */
-export function updateUserRole(userId: string, newRole: 'admin' | 'member'): boolean {
+export function updateUserRole(
+  userId: string,
+  newRole: UserRole,
+  requesterRole: UserRole = 'superadmin'
+): boolean {
   for (const [email, user] of usersStore.entries()) {
     if (user.id === userId) {
       if (email === 'safarazqiaa@gmail.com') {
-        return false; // Cannot change Super Admin role
+        return false; // Cannot modify primary Super Admin owner
+      }
+      // Only Super Admin can grant or revoke superadmin status
+      if ((newRole === 'superadmin' || user.role === 'superadmin') && requesterRole !== 'superadmin') {
+        return false;
       }
       user.role = newRole;
       usersStore.set(email, user);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
@@ -13,8 +13,10 @@ import {
   Clock,
   Users,
   Trash2,
+  RefreshCw,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { UserRole } from '../services/auth';
 import { LogoImage } from './Logo';
 
 export const AdminPanelModal: React.FC = () => {
@@ -28,11 +30,34 @@ export const AdminPanelModal: React.FC = () => {
     usersList,
     changeUserRole,
     deleteUserAccount,
+    refreshUsers,
   } = useAuth();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'security'>('overview');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
+
+  // Auto-refresh users when panel is open on the 'users' tab
+  useEffect(() => {
+    if (!isAdminPanelOpen || activeTab !== 'users') return;
+
+    refreshUsers();
+    const interval = setInterval(() => {
+      refreshUsers();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isAdminPanelOpen, activeTab, refreshUsers]);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshingUsers(true);
+    try {
+      await refreshUsers();
+    } finally {
+      setTimeout(() => setIsRefreshingUsers(false), 400);
+    }
+  };
 
   // User delete confirmation state
   const [userToDelete, setUserToDelete] = useState<{ id: string; name: string } | null>(null);
@@ -47,7 +72,7 @@ export const AdminPanelModal: React.FC = () => {
 
   if (!isAdminPanelOpen || !user) return null;
 
-  const handleChangeRole = async (userId: string, newRole: 'admin' | 'member') => {
+  const handleChangeRole = async (userId: string, newRole: UserRole) => {
     setActionLoading(`role_${userId}`);
     setFeedbackMessage(null);
     try {
@@ -261,7 +286,7 @@ export const AdminPanelModal: React.FC = () => {
                     <span>Super Admin Access</span>
                   </div>
                   <p className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                    You are logged in as <strong>{user.name}</strong> ({user.email}). As the sole Super Admin, you have full control to assign roles (Admin or Member) and delete any user accounts from the system.
+                    You are logged in as <strong>{user.name}</strong> ({user.email}). Every person who signs up automatically joins as a <strong>Member</strong>. As Super Admin, you have full authority to promote users to Super Admin or Admin, change roles, and delete accounts.
                   </p>
                 </div>
               </div>
@@ -270,15 +295,29 @@ export const AdminPanelModal: React.FC = () => {
             {/* TAB 2: USER MANAGEMENT */}
             {activeTab === 'users' && (
               <div className="space-y-4 text-left">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
                   <div>
-                    <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
-                      User Management & Roles
+                    <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                      <span>User Management & Roles</span>
+                      <span className="text-[11px] font-normal text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
+                        Live Auto-Sync
+                      </span>
                     </h3>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Only actual registered users are shown. You can toggle roles between Admin and Member, or delete accounts.
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                      New signups automatically become <strong>Member</strong>. Only Super Admin can promote someone to Super Admin, or adjust roles.
                     </p>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={handleManualRefresh}
+                    disabled={isRefreshingUsers}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                    title="Refresh user list from database"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingUsers ? 'animate-spin text-[#DB9558]' : ''}`} />
+                    <span>{isRefreshingUsers ? 'Refreshing...' : 'Refresh List'}</span>
+                  </button>
                 </div>
 
                 {feedbackMessage && (
@@ -291,7 +330,8 @@ export const AdminPanelModal: React.FC = () => {
                 {/* Users List */}
                 <div className="divide-y divide-neutral-200 dark:divide-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden bg-white dark:bg-neutral-900/40">
                   {usersList.map((u) => {
-                    const isSuper = u.role === 'superadmin' || u.email.toLowerCase() === 'safarazqiaa@gmail.com';
+                    const isPrimaryOwner = u.email.toLowerCase() === 'safarazqiaa@gmail.com';
+                    const isSuper = u.role === 'superadmin' || isPrimaryOwner;
                     const isCurrentUser = u.email.toLowerCase() === user.email.toLowerCase();
 
                     return (
@@ -305,7 +345,12 @@ export const AdminPanelModal: React.FC = () => {
                               {u.name}
                             </span>
 
-                            {isSuper ? (
+                            {isPrimaryOwner ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DB9558]/25 text-[#DB9558] border border-[#DB9558]/50">
+                                <ShieldAlert className="w-3.5 h-3.5" />
+                                Primary Super Admin
+                              </span>
+                            ) : isSuper ? (
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DB9558]/20 text-[#DB9558] border border-[#DB9558]/40">
                                 <ShieldAlert className="w-3.5 h-3.5" />
                                 Super Admin
@@ -329,56 +374,117 @@ export const AdminPanelModal: React.FC = () => {
                         </div>
 
                         {/* Action buttons */}
-                        <div className="flex items-center gap-2 shrink-0">
-                          {isSuper ? (
+                        <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                          {isPrimaryOwner ? (
                             <span className="text-xs text-neutral-500 font-medium italic px-2">
-                              Permanent Super Admin
+                              Permanent Owner
                             </span>
                           ) : (
                             <>
-                              {/* Role toggle button: ONLY Admin <-> Member */}
-                              {u.role === 'member' ? (
-                                <button
-                                  type="button"
-                                  onClick={() => handleChangeRole(u.id, 'admin')}
-                                  disabled={actionLoading === `role_${u.id}`}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#97A87A]/20 hover:bg-[#97A87A]/30 text-[#97A87A] border border-[#97A87A]/40 transition-colors cursor-pointer disabled:opacity-50"
-                                  title="Promote to Admin"
-                                >
-                                  {actionLoading === `role_${u.id}` ? (
-                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                  ) : (
-                                    <ShieldCheck className="w-3.5 h-3.5" />
+                              {/* SUPER ADMIN CAN ASSIGN SUPERADMIN, ADMIN, OR MEMBER */}
+                              {isSuperAdmin ? (
+                                <>
+                                  {/* Promote to Super Admin if not already superadmin */}
+                                  {u.role !== 'superadmin' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleChangeRole(u.id, 'superadmin')}
+                                      disabled={actionLoading === `role_${u.id}`}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#DB9558]/20 hover:bg-[#DB9558]/30 text-[#DB9558] border border-[#DB9558]/40 transition-colors cursor-pointer disabled:opacity-50"
+                                      title="Promote to Super Admin"
+                                    >
+                                      {actionLoading === `role_${u.id}` ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <ShieldAlert className="w-3.5 h-3.5" />
+                                      )}
+                                      <span>Make Super Admin</span>
+                                    </button>
                                   )}
-                                  <span>Make Admin</span>
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => handleChangeRole(u.id, 'member')}
-                                  disabled={actionLoading === `role_${u.id}`}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700 transition-colors cursor-pointer disabled:opacity-50"
-                                  title="Demote to Member"
-                                >
-                                  {actionLoading === `role_${u.id}` ? (
-                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                  ) : null}
-                                  <span>Make Member</span>
-                                </button>
-                              )}
 
-                              {/* Delete User Button (Super Admin Exclusive) */}
-                              {isSuperAdmin && (
-                                <button
-                                  type="button"
-                                  onClick={() => setUserToDelete({ id: u.id, name: u.name })}
-                                  disabled={actionLoading === `del_${u.id}`}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors cursor-pointer disabled:opacity-50"
-                                  title="Permanently delete user"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                  <span>Delete</span>
-                                </button>
+                                  {/* Make Admin if not currently admin */}
+                                  {u.role !== 'admin' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleChangeRole(u.id, 'admin')}
+                                      disabled={actionLoading === `role_${u.id}`}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#97A87A]/20 hover:bg-[#97A87A]/30 text-[#97A87A] border border-[#97A87A]/40 transition-colors cursor-pointer disabled:opacity-50"
+                                      title="Set role to Admin"
+                                    >
+                                      {actionLoading === `role_${u.id}` ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <ShieldCheck className="w-3.5 h-3.5" />
+                                      )}
+                                      <span>Make Admin</span>
+                                    </button>
+                                  )}
+
+                                  {/* Make Member if not currently member */}
+                                  {u.role !== 'member' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleChangeRole(u.id, 'member')}
+                                      disabled={actionLoading === `role_${u.id}`}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700 transition-colors cursor-pointer disabled:opacity-50"
+                                      title="Demote to Member"
+                                    >
+                                      {actionLoading === `role_${u.id}` ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : null}
+                                      <span>Make Member</span>
+                                    </button>
+                                  )}
+
+                                  {/* Delete User Button (Super Admin Exclusive) */}
+                                  <button
+                                    type="button"
+                                    onClick={() => setUserToDelete({ id: u.id, name: u.name })}
+                                    disabled={actionLoading === `del_${u.id}`}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors cursor-pointer disabled:opacity-50"
+                                    title="Permanently delete user"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <span>Delete</span>
+                                  </button>
+                                </>
+                              ) : (
+                                /* REGULAR ADMIN CAN ONLY TOGGLE ADMIN <-> MEMBER (CANNOT MAKE SUPER ADMIN) */
+                                <>
+                                  {u.role === 'member' ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleChangeRole(u.id, 'admin')}
+                                      disabled={actionLoading === `role_${u.id}`}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#97A87A]/20 hover:bg-[#97A87A]/30 text-[#97A87A] border border-[#97A87A]/40 transition-colors cursor-pointer disabled:opacity-50"
+                                      title="Promote to Admin"
+                                    >
+                                      {actionLoading === `role_${u.id}` ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <ShieldCheck className="w-3.5 h-3.5" />
+                                      )}
+                                      <span>Make Admin</span>
+                                    </button>
+                                  ) : u.role === 'admin' ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleChangeRole(u.id, 'member')}
+                                      disabled={actionLoading === `role_${u.id}`}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700 transition-colors cursor-pointer disabled:opacity-50"
+                                      title="Demote to Member"
+                                    >
+                                      {actionLoading === `role_${u.id}` ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : null}
+                                      <span>Make Member</span>
+                                    </button>
+                                  ) : (
+                                    <span className="text-xs text-neutral-500 font-medium italic px-2">
+                                      Super Admin (Protected)
+                                    </span>
+                                  )}
+                                </>
                               )}
                             </>
                           )}

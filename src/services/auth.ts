@@ -15,6 +15,7 @@ export interface AuthResponse {
   message?: string;
   user?: UserProfile;
   token?: string;
+  reason?: 'NOT_REGISTERED' | 'INVALID_PASSWORD' | 'MISSING_FIELDS';
 }
 
 const TOKEN_STORAGE_KEY = 'wpa_auth_token';
@@ -177,14 +178,24 @@ export const authService = {
       if (data && data.message) {
         return {
           success: false,
+          reason: data.reason,
           message: data.message,
+        };
+      }
+
+      if (response.status === 404) {
+        return {
+          success: false,
+          reason: 'NOT_REGISTERED',
+          message: 'This email is not registered yet. Please sign up first.',
         };
       }
 
       if (response.status === 401) {
         return {
           success: false,
-          message: 'Incorrect email or password. Please try again.',
+          reason: 'INVALID_PASSWORD',
+          message: 'Incorrect password. Please try again.',
         };
       }
 
@@ -222,7 +233,8 @@ export const authService = {
 
       return {
         success: false,
-        message: 'Incorrect email or password. Please try again.',
+        reason: 'NOT_REGISTERED',
+        message: 'This email is not registered yet. Please sign up first.',
       };
     }
   },
@@ -314,7 +326,7 @@ export const authService = {
     return getStoredUsersList();
   },
 
-  async updateUserRole(userId: string, newRole: 'admin' | 'member'): Promise<{ success: boolean; users?: UserProfile[]; message?: string }> {
+  async updateUserRole(userId: string, newRole: UserRole): Promise<{ success: boolean; users?: UserProfile[]; message?: string }> {
     const token = this.getToken();
     if (!token) return { success: false, message: 'Unauthorized.' };
 

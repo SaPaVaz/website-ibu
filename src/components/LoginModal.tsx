@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import { X, Eye, EyeOff, Loader2, AlertCircle, UserPlus, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { LogoImage } from './Logo';
 
@@ -13,12 +13,14 @@ export const LoginModal: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorReason, setErrorReason] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isLoginModalOpen) {
       setMode(loginModalMode || 'login');
       setErrorMessage('');
+      setErrorReason(null);
     }
   }, [isLoginModalOpen, loginModalMode]);
 
@@ -69,10 +71,12 @@ export const LoginModal: React.FC = () => {
       try {
         const res = await login(email, password);
         if (!res.success) {
+          setErrorReason(res.reason || null);
           setErrorMessage(res.message || 'Incorrect email or password. Please try again.');
         } else {
           setEmail('');
           setPassword('');
+          setErrorReason(null);
         }
       } catch {
         setErrorMessage('A network error occurred. Please try again.');
@@ -177,9 +181,42 @@ export const LoginModal: React.FC = () => {
                 exit={{ opacity: 0, height: 0, y: -8 }}
                 className="mb-5 overflow-hidden"
               >
-                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs sm:text-sm leading-snug">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>{errorMessage}</span>
+                <div className={`p-3.5 rounded-xl border text-xs sm:text-sm leading-snug space-y-2 ${
+                  errorReason === 'NOT_REGISTERED'
+                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800/80 text-amber-900 dark:text-amber-200'
+                    : 'bg-red-50 dark:bg-red-950/40 border-red-300 dark:border-red-900/60 text-red-700 dark:text-red-300'
+                }`}>
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      {errorReason === 'NOT_REGISTERED' ? (
+                        <>
+                          <strong className="block font-bold">Account Not Registered</strong>
+                          <span>{errorMessage}</span>
+                        </>
+                      ) : (
+                        <span>{errorMessage}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {errorReason === 'NOT_REGISTERED' && (
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMode('signup');
+                          setErrorMessage('');
+                          setErrorReason(null);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#DB9558] hover:bg-[#c48145] text-white shadow-xs transition-colors cursor-pointer"
+                      >
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>Sign Up with this email</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
