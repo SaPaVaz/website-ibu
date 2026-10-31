@@ -14,7 +14,6 @@ interface SimpleRes {
 }
 
 export default function handler(req: SimpleReq, res: SimpleRes) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -37,7 +36,7 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: 'Email dan password wajib diisi.',
+      message: 'Email and password are required.',
     });
   }
 
@@ -46,13 +45,13 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
   if (!authResult) {
     return res.status(401).json({
       success: false,
-      message: 'Email atau password salah. Silakan periksa kembali.',
+      message: 'Incorrect email or password. Please try again.',
     });
   }
 
   return res.status(200).json({
     success: true,
-    message: 'Login berhasil.',
+    message: 'Login successful.',
     user: authResult.user,
     token: authResult.token,
   });

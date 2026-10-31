@@ -1,19 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import {
-  Lock,
-  Mail,
-  Eye,
-  EyeOff,
-  Loader2,
-  AlertCircle,
-  User,
-  UserPlus,
-  LogIn,
-  Store,
-  MapPin,
-  Sparkles,
-} from 'lucide-react';
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { LogoImage } from './Logo';
 
@@ -35,11 +22,11 @@ export const AuthGatewayScreen: React.FC = () => {
     setErrorMessage('');
 
     if (!email.trim()) {
-      setErrorMessage('Silakan isi email Anda.');
+      setErrorMessage('Please enter your email address.');
       return;
     }
     if (!password) {
-      setErrorMessage('Silakan isi password Anda.');
+      setErrorMessage('Please enter your password.');
       return;
     }
 
@@ -48,116 +35,91 @@ export const AuthGatewayScreen: React.FC = () => {
     try {
       if (tab === 'signup') {
         if (password.length < 6) {
-          setErrorMessage('Password minimal harus 6 karakter.');
+          setErrorMessage('Password must be at least 6 characters.');
           setIsSubmitting(false);
           return;
         }
         if (password !== confirmPassword) {
-          setErrorMessage('Konfirmasi password tidak cocok.');
+          setErrorMessage('Passwords do not match. Please re-enter.');
           setIsSubmitting(false);
           return;
         }
 
         const res = await signup(name, email, password);
         if (!res.success) {
-          setErrorMessage(res.message || 'Pendaftaran gagal. Silakan coba lagi.');
+          setErrorMessage(res.message || 'Registration failed. Please try again.');
         }
-        // If success, AuthContext automatically updates isAuthenticated = true and user enters Beranda immediately!
       } else {
         const res = await login(email, password);
         if (!res.success) {
-          setErrorMessage(res.message || 'Email atau password yang Anda masukkan salah.');
+          setErrorMessage(res.message || 'Incorrect email or password. Please try again.');
         }
-        // If success, AuthContext automatically updates isAuthenticated = true and user enters Beranda immediately!
       }
     } catch {
-      setErrorMessage('Terjadi kendala jaringan. Silakan coba lagi.');
+      setErrorMessage('A network error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleQuickFill = (fillEmail: string, fillPass: string) => {
-    setTab('login');
-    setEmail(fillEmail);
-    setPassword(fillPass);
-    setErrorMessage('');
-  };
-
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between bg-[#FCF9EA] dark:bg-[#181614] text-[#2B2520] dark:text-[#FCF9EA] transition-colors p-4 sm:p-6 md:p-8 relative overflow-hidden select-none">
-      {/* Background Ambience Orbs */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#DB9558]/20 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#97A87A]/25 blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen w-full flex flex-col justify-between bg-[#FCF9EA] dark:bg-[#151311] text-[#2B2520] dark:text-[#FCF9EA] transition-colors p-4 sm:p-6 md:p-8 relative select-none">
       {/* Top Bar Branding */}
-      <header className="relative z-10 w-full max-w-5xl mx-auto flex items-center justify-between py-2">
-        <div className="flex items-center gap-2.5">
-          <LogoImage sizeClass="w-8 h-8 sm:w-9 sm:h-9" />
+      <header className="relative z-10 w-full max-w-4xl mx-auto flex items-center justify-between py-2 border-b border-[#E3DCBE] dark:border-neutral-800 pb-3">
+        <div className="flex items-center gap-3">
+          <LogoImage sizeClass="w-9 h-9" />
           <div className="flex flex-col leading-tight">
-            <span className="font-bold tracking-tight text-xs sm:text-sm uppercase">
+            <span className="font-bold tracking-tight text-sm uppercase text-[#2B2520] dark:text-neutral-100">
               WARUNG POJOK ARO
             </span>
-            <span className="text-[10px] text-[#97A87A] dark:text-[#A8BBA3] font-medium">
-              Toko Serba Ada &bull; Wonosobo
+            <span className="text-xs text-[#6B6357] dark:text-[#A8BBA3]">
+              Daily Groceries &bull; Mojotengah, Wonosobo
             </span>
           </div>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#E3DCBE] dark:border-neutral-800 bg-white/60 dark:bg-neutral-900/60 backdrop-blur-sm text-[11px] font-medium text-[#6B6357] dark:text-[#A8BBA3]">
-          <MapPin className="w-3 h-3 text-[#DB9558]" />
-          <span>Mojotengah</span>
-        </div>
+        <span className="text-xs font-semibold px-3 py-1 rounded-full border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 bg-white/80 dark:bg-neutral-800/80">
+          Wonosobo
+        </span>
       </header>
 
       {/* Main Gateway Card */}
-      <main className="relative z-10 w-full max-w-md mx-auto my-auto py-6">
+      <main className="relative z-10 w-full max-w-md mx-auto my-auto py-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="rounded-3xl border border-[#E3DCBE] dark:border-neutral-800 bg-white/95 dark:bg-[#221F1B]/95 backdrop-blur-md p-6 sm:p-8 shadow-xl"
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#1E1B18] p-6 sm:p-8 shadow-xl"
         >
-          {/* Logo & Welcome Header */}
+          {/* Logo & Clean Title */}
           <div className="text-center mb-6">
-            <div className="w-16 h-16 sm:w-18 sm:h-18 mx-auto mb-3.5 relative">
-              <motion.div
-                animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.7, 0.4] }}
-                transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                className="absolute -inset-1.5 rounded-2xl bg-gradient-to-tr from-[#DB9558]/30 to-[#97A87A]/30 blur-xs"
-              />
+            <div className="w-16 h-16 mx-auto mb-3">
               <LogoImage sizeClass="w-full h-full" />
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#97A87A]/15 border border-[#97A87A]/30 text-[11px] font-semibold text-[#97A87A] dark:text-[#A8BBA3] mb-2">
-              <Store className="w-3 h-3 text-[#DB9558]" />
-              <span>Pintu Masuk Website</span>
-            </div>
-
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 uppercase">
               Warung Pojok Aro
             </h1>
-            <p className="text-xs sm:text-sm text-[#6B6357] dark:text-[#A8BBA3] mt-1 leading-relaxed">
-              Silakan masuk atau daftar akun terlebih dahulu untuk mengakses beranda dan katalog toko.
+            <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 mt-1 leading-relaxed">
+              Login or create an account to access the store.
             </p>
           </div>
 
-          {/* Toggle Tabs: Masuk (Login) vs Daftar (Sign Up) */}
-          <div className="flex p-1 rounded-2xl bg-[#FCF9EA] dark:bg-neutral-900 border border-[#E3DCBE] dark:border-neutral-800 mb-5">
+          {/* Toggle Tabs: High-Contrast and Crystal Clear in BOTH Light & Dark Modes */}
+          <div className="grid grid-cols-2 p-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 mb-6 gap-2">
             <button
               type="button"
               onClick={() => {
                 setTab('login');
                 setErrorMessage('');
               }}
-              className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`py-2.5 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all cursor-pointer text-center ${
                 tab === 'login'
-                  ? 'bg-white dark:bg-[#282420] text-heading shadow-xs border border-[#E3DCBE] dark:border-neutral-700'
-                  : 'text-muted hover:text-heading'
+                  ? 'bg-[#DB9558] text-white shadow-sm ring-1 ring-[#DB9558]'
+                  : 'bg-white/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 hover:bg-white dark:hover:bg-neutral-600 border border-neutral-300 dark:border-neutral-600'
               }`}
             >
-              <LogIn className="w-3.5 h-3.5 text-[#DB9558]" />
-              <span>Masuk (Login)</span>
+              Login
             </button>
 
             <button
@@ -166,14 +128,13 @@ export const AuthGatewayScreen: React.FC = () => {
                 setTab('signup');
                 setErrorMessage('');
               }}
-              className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`py-2.5 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all cursor-pointer text-center ${
                 tab === 'signup'
-                  ? 'bg-white dark:bg-[#282420] text-heading shadow-xs border border-[#E3DCBE] dark:border-neutral-700'
-                  : 'text-muted hover:text-heading'
+                  ? 'bg-[#DB9558] text-white shadow-sm ring-1 ring-[#DB9558]'
+                  : 'bg-white/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 hover:bg-white dark:hover:bg-neutral-600 border border-neutral-300 dark:border-neutral-600'
               }`}
             >
-              <UserPlus className="w-3.5 h-3.5 text-[#97A87A]" />
-              <span>Daftar (Sign Up)</span>
+              Sign Up
             </button>
           </div>
 
@@ -186,7 +147,7 @@ export const AuthGatewayScreen: React.FC = () => {
                 exit={{ opacity: 0, height: 0, y: -6 }}
                 className="mb-4 overflow-hidden"
               >
-                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs sm:text-sm leading-snug">
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs sm:text-sm leading-snug">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{errorMessage}</span>
                 </div>
@@ -194,106 +155,89 @@ export const AuthGatewayScreen: React.FC = () => {
             )}
           </AnimatePresence>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-3.5">
-            {/* Nama Lengkap (Sign Up Only) */}
+          {/* Form with Clean High-Contrast Inputs without Clutter */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Full Name (Sign Up Only) */}
             {tab === 'signup' && (
-              <div className="space-y-1 text-left">
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#6B6357] dark:text-[#A8BBA3]">
-                  Nama Lengkap
+              <div className="space-y-1.5 text-left">
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+                  Full Name
                 </label>
-                <div className="relative flex items-center">
-                  <span className="absolute left-3.5 text-muted pointer-events-none">
-                    <User className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Nama lengkap Anda"
-                    disabled={isSubmitting}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E3DCBE] dark:border-neutral-700 bg-[#FCF9EA]/60 dark:bg-neutral-900/60 text-heading text-sm placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-[#DB9558] transition-all"
-                  />
-                </div>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your full name"
+                  disabled={isSubmitting}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
+                />
               </div>
             )}
 
-            {/* Email */}
-            <div className="space-y-1 text-left">
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#6B6357] dark:text-[#A8BBA3]">
-                Email
+            {/* Email Address */}
+            <div className="space-y-1.5 text-left">
+              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+                Email Address
               </label>
-              <div className="relative flex items-center">
-                <span className="absolute left-3.5 text-muted pointer-events-none">
-                  <Mail className="w-4 h-4" />
-                </span>
-                <input
-                  type="email"
-                  autoComplete="username"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="nama@email.com"
-                  disabled={isSubmitting}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E3DCBE] dark:border-neutral-700 bg-[#FCF9EA]/60 dark:bg-neutral-900/60 text-heading text-sm placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-[#DB9558] transition-all"
-                />
-              </div>
+              <input
+                type="email"
+                autoComplete="username"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@email.com"
+                disabled={isSubmitting}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
+              />
             </div>
 
             {/* Password */}
-            <div className="space-y-1 text-left">
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#6B6357] dark:text-[#A8BBA3]">
+            <div className="space-y-1.5 text-left">
+              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
                 Password
               </label>
               <div className="relative flex items-center">
-                <span className="absolute left-3.5 text-muted pointer-events-none">
-                  <Lock className="w-4 h-4" />
-                </span>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   autoComplete={tab === 'signup' ? 'new-password' : 'current-password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={tab === 'signup' ? 'Minimal 6 karakter' : 'Masukkan password'}
+                  placeholder={tab === 'signup' ? 'Minimum 6 characters' : 'Enter your password'}
                   disabled={isSubmitting}
-                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-[#E3DCBE] dark:border-neutral-700 bg-[#FCF9EA]/60 dark:bg-neutral-900/60 text-heading text-sm placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-[#DB9558] transition-all"
+                  className="w-full pl-3.5 pr-11 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                   disabled={isSubmitting}
-                  className="absolute right-3.5 p-1 text-muted hover:text-heading transition-colors cursor-pointer"
-                  title={showPassword ? 'Sembunyikan password' : 'Lihat password'}
+                  className="absolute right-3.5 p-1 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors cursor-pointer"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Konfirmasi Password (Sign Up Only) */}
+            {/* Confirm Password (Sign Up Only) */}
             {tab === 'signup' && (
-              <div className="space-y-1 text-left">
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#6B6357] dark:text-[#A8BBA3]">
-                  Konfirmasi Password
+              <div className="space-y-1.5 text-left">
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+                  Confirm Password
                 </label>
-                <div className="relative flex items-center">
-                  <span className="absolute left-3.5 text-muted pointer-events-none">
-                    <Lock className="w-4 h-4" />
-                  </span>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Ulangi password di atas"
-                    disabled={isSubmitting}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E3DCBE] dark:border-neutral-700 bg-[#FCF9EA]/60 dark:bg-neutral-900/60 text-heading text-sm placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-[#DB9558] transition-all"
-                  />
-                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter your password"
+                  disabled={isSubmitting}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
+                />
               </div>
             )}
 
@@ -302,71 +246,60 @@ export const AuthGatewayScreen: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="btn-primary w-full py-3 px-4 rounded-xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-60 transition-all hover:scale-[1.01]"
+                className="btn-primary w-full py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-60 transition-all"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>{tab === 'signup' ? 'Mendaftarkan Akun...' : 'Masuk ke Beranda...'}</span>
+                    <span>{tab === 'signup' ? 'Creating Account...' : 'Logging in...'}</span>
                   </>
                 ) : (
-                  <>
-                    {tab === 'signup' ? <UserPlus className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
-                    <span>{tab === 'signup' ? 'Daftar & Langsung Masuk' : 'Masuk ke Beranda Website'}</span>
-                  </>
+                  <span>{tab === 'signup' ? 'Sign Up' : 'Login'}</span>
                 )}
               </button>
             </div>
           </form>
 
-          {/* Quick Access Badges for Owner */}
-          <div className="mt-6 pt-4 border-t border-[#E3DCBE] dark:border-neutral-800 text-center">
-            <div className="text-[11px] text-muted space-y-2">
-              <p>
-                {tab === 'signup' ? (
-                  <>
-                    Sudah punya akun?{' '}
-                    <button
-                      type="button"
-                      onClick={() => setTab('login')}
-                      className="text-[#DB9558] font-bold hover:underline cursor-pointer"
-                    >
-                      Masuk di sini
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    Belum punya akun?{' '}
-                    <button
-                      type="button"
-                      onClick={() => setTab('signup')}
-                      className="text-[#DB9558] font-bold hover:underline cursor-pointer"
-                    >
-                      Daftar akun baru
-                    </button>
-                  </>
-                )}
-              </p>
-
-              {/* Quick fill helper for owner */}
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('safarazqiaa@gmail.com', 'Tasik*2026')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-[#97A87A]/15 hover:bg-[#97A87A]/25 text-[#97A87A] dark:text-[#A8BBA3] border border-[#97A87A]/30 transition-colors cursor-pointer"
-                >
-                  <Sparkles className="w-3 h-3 text-[#DB9558]" />
-                  <span>Isi Otomatis Akun Pemilik (safarazqiaa@gmail.com)</span>
-                </button>
-              </div>
-            </div>
+          {/* Switch Tab Footer */}
+          <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700 text-center">
+            <p className="text-xs text-neutral-600 dark:text-neutral-300">
+              {tab === 'signup' ? (
+                <>
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTab('login');
+                      setErrorMessage('');
+                    }}
+                    className="text-[#DB9558] font-bold hover:underline cursor-pointer"
+                  >
+                    Login here
+                  </button>
+                </>
+              ) : (
+                <>
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTab('signup');
+                      setErrorMessage('');
+                    }}
+                    className="text-[#DB9558] font-bold hover:underline cursor-pointer"
+                  >
+                    Sign up here
+                  </button>
+                </>
+              )}
+            </p>
           </div>
         </motion.div>
       </main>
 
       {/* Footer Info */}
-      <footer className="relative z-10 w-full max-w-5xl mx-auto py-2 text-center text-[11px] text-[#6B6357] dark:text-[#A8BBA3]">
-        <p>&copy; {new Date().getFullYear()} Warung Pojok Aro &bull; Toko Serba Ada &bull; Kleyang Jurang, Mojotengah, Wonosobo</p>
+      <footer className="relative z-10 w-full max-w-4xl mx-auto py-2 text-center text-xs text-neutral-600 dark:text-neutral-400 border-t border-[#E3DCBE] dark:border-neutral-800 pt-3">
+        <p>&copy; {new Date().getFullYear()} Warung Pojok Aro &bull; Kleyang Jurang, Mojotengah, Wonosobo</p>
       </footer>
     </div>
   );

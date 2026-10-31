@@ -30,11 +30,11 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
   const { name, email, password } = req.body || {};
 
   if (!email || !password) {
-    return res.status(400).json({ success: false, message: 'Email dan password wajib diisi.' });
+    return res.status(400).json({ success: false, message: 'Email and password are required.' });
   }
 
   if (password.length < 6) {
-    return res.status(400).json({ success: false, message: 'Password minimal 6 karakter.' });
+    return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' });
   }
 
   const result = registerUser(name || '', email, password);
@@ -45,7 +45,7 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
 
   return res.status(201).json({
     success: true,
-    message: `Pendaftaran berhasil sebagai ${result.user.role === 'admin' ? 'Admin' : 'Member'}!`,
+    message: `Sign up successful as ${result.user.role === 'superadmin' ? 'Super Admin' : result.user.role === 'admin' ? 'Admin' : 'Member'}!`,
     user: result.user,
     token: result.token,
   });

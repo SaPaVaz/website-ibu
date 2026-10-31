@@ -1,6 +1,8 @@
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
-export type UserRole = 'admin' | 'member';
+export type UserRole = 'superadmin' | 'admin' | 'member';
 
 export interface AppUser {
   id: string;
@@ -15,6 +17,8 @@ export interface AppUser {
 export type SafeUser = Omit<AppUser, 'salt' | 'hash'>;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'warung_pojok_aro_secret_key_2026_secure_hash';
+const DATA_DIR = path.resolve(process.cwd(), 'data');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
 
 function hashPassword(password: string, salt: string): string {
   return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
@@ -26,72 +30,89 @@ function createPasswordHash(password: string): { salt: string; hash: string } {
   return { salt, hash };
 }
 
-// Initial Registered Users:
-// 1. safarazqiaa@gmail.com (qia201412) -> ADMIN (Owner)
-// 2. admin@warungpojokaro.com (WPAro#2026!) -> ADMIN
-// 3. Demo Members
-const ownerCreds = createPasswordHash('qia201412');
-const defaultAdminCreds = createPasswordHash('WPAro#2026!');
-const member1Creds = createPasswordHash('member123');
-const member2Creds = createPasswordHash('member123');
+// In-memory store
+const usersStore: Map<string, AppUser> = new Map();
 
-const usersStore: Map<string, AppUser> = new Map([
-  [
-    'safarazqiaa@gmail.com',
-    {
-      id: 'usr_owner_001',
+function ensureDataDir(): void {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+  } catch (err) {
+    console.error('Failed to create data directory:', err);
+  }
+}
+
+function saveUsersToDisk(): void {
+  try {
+    ensureDataDir();
+    const array = Array.from(usersStore.values());
+    fs.writeFileSync(USERS_FILE, JSON.stringify(array, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to persist users to disk:', err);
+  }
+}
+
+function loadUsersFromDisk(): void {
+  try {
+    ensureDataDir();
+    if (fs.existsSync(USERS_FILE)) {
+      const data = fs.readFileSync(USERS_FILE, 'utf-8');
+      const parsed: AppUser[] = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        usersStore.clear();
+        for (const user of parsed) {
+          const emailLower = user.email.toLowerCase();
+          // Remove any unrequested test/mock accounts
+          if (
+            emailLower !== 'admin@warungpojokaro.com' &&
+            emailLower !== 'budi.santoso@gmail.com' &&
+            emailLower !== 'siti.aminah@gmail.com' &&
+            emailLower !== 'rahmat.hidayat@gmail.com'
+          ) {
+            // Guarantee safarazqiaa@gmail.com is always superadmin
+            if (emailLower === 'safarazqiaa@gmail.com') {
+              user.role = 'superadmin';
+            }
+            usersStore.set(emailLower, user);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load users from disk:', err);
+  }
+
+  // Ensure safarazqiaa@gmail.com is registered as the SOLE Super Admin
+  if (!usersStore.has('safarazqiaa@gmail.com')) {
+    const ownerCreds = createPasswordHash('Tasik*2026');
+    usersStore.set('safarazqiaa@gmail.com', {
+      id: 'usr_superadmin_001',
       email: 'safarazqiaa@gmail.com',
-      name: 'Safaraz Qia (Owner)',
-      role: 'admin',
+      name: 'Safaraz Qia (Super Admin)',
+      role: 'superadmin',
       salt: ownerCreds.salt,
       hash: ownerCreds.hash,
       createdAt: new Date().toISOString(),
-    },
-  ],
-  [
-    'admin@warungpojokaro.com',
-    {
-      id: 'usr_admin_001',
-      email: 'admin@warungpojokaro.com',
-      name: 'Admin Warung Pojok Aro',
-      role: 'admin',
-      salt: defaultAdminCreds.salt,
-      hash: defaultAdminCreds.hash,
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  [
-    'budi.santoso@gmail.com',
-    {
-      id: 'usr_mem_001',
-      email: 'budi.santoso@gmail.com',
-      name: 'Budi Santoso',
-      role: 'member',
-      salt: member1Creds.salt,
-      hash: member1Creds.hash,
-      createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    },
-  ],
-  [
-    'siti.aminah@gmail.com',
-    {
-      id: 'usr_mem_002',
-      email: 'siti.aminah@gmail.com',
-      name: 'Siti Aminah',
-      role: 'member',
-      salt: member2Creds.salt,
-      hash: member2Creds.hash,
-      createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
-    },
-  ],
-]);
+    });
+  } else {
+    const owner = usersStore.get('safarazqiaa@gmail.com')!;
+    owner.role = 'superadmin';
+    usersStore.set('safarazqiaa@gmail.com', owner);
+  }
+
+  saveUsersToDisk();
+}
+
+// Initial load
+loadUsersFromDisk();
 
 /**
  * Sign a secure JWT-like token with HMAC-SHA256
  */
 export function signToken(payload: { id: string; email: string; role: UserRole }): string {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
-  const exp = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+  const exp = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days session
   const body = Buffer.from(JSON.stringify({ ...payload, exp })).toString('base64url');
   const signature = crypto
     .createHmac('sha256', JWT_SECRET)
@@ -136,9 +157,8 @@ function toSafeUser(user: AppUser): SafeUser {
 
 /**
  * Register a new user (Sign Up)
- * Rule:
- * - safarazqiaa@gmail.com is ALWAYS role 'admin'
- * - All other users start with role 'member'
+ * - safarazqiaa@gmail.com is ALWAYS the exclusive 'superadmin'
+ * - Every other person who signs up is ALWAYS 'member'
  */
 export function registerUser(
   name: string,
@@ -147,30 +167,28 @@ export function registerUser(
 ): { user: SafeUser; token: string } | { error: string } {
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail || !password) {
-    return { error: 'Email dan password wajib diisi.' };
+    return { error: 'Email and password are required.' };
   }
 
   if (usersStore.has(normalizedEmail)) {
-    // If it's the owner email, update their credentials/name and log in immediately
+    // If it's the super admin, update credentials/name and log in immediately
     if (normalizedEmail === 'safarazqiaa@gmail.com') {
       const owner = usersStore.get(normalizedEmail)!;
       const { salt, hash } = createPasswordHash(password);
       owner.salt = salt;
       owner.hash = hash;
+      owner.role = 'superadmin';
       if (name.trim()) owner.name = name.trim();
       usersStore.set(normalizedEmail, owner);
+      saveUsersToDisk();
       const token = signToken({ id: owner.id, email: owner.email, role: owner.role });
       return { user: toSafeUser(owner), token };
     }
-    return { error: 'Email ini sudah terdaftar. Silakan langsung login.' };
+    return { error: 'This email is already registered. Please login.' };
   }
 
-  // Role assignment:
-  // Owner email gets admin automatically, others get member
-  const role: UserRole =
-    normalizedEmail === 'safarazqiaa@gmail.com' || normalizedEmail === 'admin@warungpojokaro.com'
-      ? 'admin'
-      : 'member';
+  // Only safarazqiaa@gmail.com is superadmin, everyone else is member
+  const role: UserRole = normalizedEmail === 'safarazqiaa@gmail.com' ? 'superadmin' : 'member';
 
   const { salt, hash } = createPasswordHash(password);
   const newUser: AppUser = {
@@ -184,6 +202,7 @@ export function registerUser(
   };
 
   usersStore.set(normalizedEmail, newUser);
+  saveUsersToDisk();
 
   const token = signToken({
     id: newUser.id,
@@ -216,12 +235,15 @@ export function authenticate(
   const computedHash = hashPassword(password, existingUser.salt);
   let isPasswordValid = computedHash === existingUser.hash;
 
+  // Seamless password match for super admin
   if (!isPasswordValid && normalizedEmail === 'safarazqiaa@gmail.com') {
     if (password === 'Tasik*2026' || password === 'qia201412') {
       const { salt, hash } = createPasswordHash(password);
       existingUser.salt = salt;
       existingUser.hash = hash;
+      existingUser.role = 'superadmin';
       usersStore.set(normalizedEmail, existingUser);
+      saveUsersToDisk();
       isPasswordValid = true;
     }
   }
@@ -255,11 +277,10 @@ export function getUserByToken(token: string): SafeUser | null {
   return toSafeUser(user);
 }
 
-// Backwards-compatible alias
 export const getAdminByToken = getUserByToken;
 
 /**
- * Get all registered users (for Admin User Management)
+ * Get all registered users (for Super Admin & Admin)
  */
 export function getAllUsers(): SafeUser[] {
   const list: SafeUser[] = [];
@@ -270,17 +291,35 @@ export function getAllUsers(): SafeUser[] {
 }
 
 /**
- * Update user role (Admin can promote/demote users)
+ * Update user role: only between 'admin' and 'member'
+ * Super Admin cannot be downgraded, and other users cannot become super admin!
  */
-export function updateUserRole(userId: string, newRole: UserRole): boolean {
+export function updateUserRole(userId: string, newRole: 'admin' | 'member'): boolean {
   for (const [email, user] of usersStore.entries()) {
     if (user.id === userId) {
-      // Prevent demoting the primary owner
-      if (email === 'safarazqiaa@gmail.com' && newRole !== 'admin') {
-        return false;
+      if (email === 'safarazqiaa@gmail.com') {
+        return false; // Cannot change Super Admin role
       }
       user.role = newRole;
       usersStore.set(email, user);
+      saveUsersToDisk();
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Delete a user (Super Admin only capability)
+ */
+export function deleteUser(userId: string): boolean {
+  for (const [email, user] of usersStore.entries()) {
+    if (user.id === userId) {
+      if (email === 'safarazqiaa@gmail.com') {
+        return false; // Cannot delete Super Admin
+      }
+      usersStore.delete(email);
+      saveUsersToDisk();
       return true;
     }
   }
@@ -303,5 +342,6 @@ export function updatePassword(userEmail: string, oldPassword: string, newPasswo
   user.salt = salt;
   user.hash = hash;
   usersStore.set(userEmail.toLowerCase(), user);
+  saveUsersToDisk();
   return true;
 }

@@ -1,4 +1,4 @@
-import { getAdminByToken } from '../../src/server/authService.js';
+import { getUserByToken } from '../../src/server/authService.js';
 
 interface SimpleReq {
   method?: string;
@@ -29,15 +29,15 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Token otentikasi tidak ditemukan.',
+      message: 'Authentication token not found.',
     });
   }
 
-  const user = getAdminByToken(token);
+  const user = getUserByToken(token);
   if (!user) {
     return res.status(401).json({
       success: false,
-      message: 'Sesi telah berakhir atau tidak valid.',
+      message: 'Session expired or invalid.',
     });
   }
 

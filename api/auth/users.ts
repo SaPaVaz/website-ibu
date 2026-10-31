@@ -1,4 +1,4 @@
-import { getUserByToken, getAllUsers, updateUserRole, UserRole } from '../../src/server/authService.js';
+import { getUserByToken, getAllUsers, updateUserRole, deleteUser } from '../../src/server/authService.js';
 
 interface SimpleReq {
   method?: string;
@@ -16,7 +16,7 @@ interface SimpleRes {
 
 export default function handler(req: SimpleReq, res: SimpleRes) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,PATCH,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,PATCH,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -28,12 +28,12 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
   const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
 
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Tidak terotentikasi.' });
+    return res.status(401).json({ success: false, message: 'Unauthorized.' });
   }
 
   const requester = getUserByToken(token);
-  if (!requester || requester.role !== 'admin') {
-    return res.status(403).json({ success: false, message: 'Hanya admin yang memiliki izin.' });
+  if (!requester || (requester.role !== 'superadmin' && requester.role !== 'admin')) {
+    return res.status(403).json({ success: false, message: 'Forbidden. Admin privileges required.' });
   }
 
   if (req.method === 'GET') {
@@ -43,13 +43,28 @@ export default function handler(req: SimpleReq, res: SimpleRes) {
   if (req.method === 'PATCH') {
     const { userId, role } = req.body || {};
     if (!userId || (role !== 'admin' && role !== 'member')) {
-      return res.status(400).json({ success: false, message: 'Parameter tidak valid.' });
+      return res.status(400).json({ success: false, message: 'Role must be admin or member.' });
     }
-    const updated = updateUserRole(userId, role as UserRole);
+    const updated = updateUserRole(userId, role);
     if (!updated) {
-      return res.status(400).json({ success: false, message: 'Gagal memperbarui role pengguna.' });
+      return res.status(400).json({ success: false, message: 'Cannot modify Super Admin or user not found.' });
     }
-    return res.status(200).json({ success: true, users: getAllUsers() });
+    return res.status(200).json({ success: true, message: `User role updated to ${role}.`, users: getAllUsers() });
+  }
+
+  if (req.method === 'DELETE') {
+    if (requester.role !== 'superadmin') {
+      return res.status(403).json({ success: false, message: 'Only Super Admin can delete users.' });
+    }
+    const { userId } = req.body || req.query || {};
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required.' });
+    }
+    const deleted = deleteUser(userId);
+    if (!deleted) {
+      return res.status(400).json({ success: false, message: 'Cannot delete Super Admin account or user not found.' });
+    }
+    return res.status(200).json({ success: true, message: 'User successfully deleted.', users: getAllUsers() });
   }
 
   return res.status(405).json({ success: false, message: 'Method Not Allowed' });

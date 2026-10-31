@@ -5,8 +5,8 @@ import {
   getUserByToken,
   getAllUsers,
   updateUserRole,
+  deleteUser,
   updatePassword,
-  UserRole,
 } from './authService.js';
 
 const router = Router();
@@ -26,36 +26,32 @@ router.post('/signup', (req: Request, res: Response) => {
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: 'Email dan password wajib diisi.',
+      message: 'Email and password are required.',
     });
   }
 
   if (password.length < 6) {
     return res.status(400).json({
       success: false,
-      message: 'Password minimal 6 karakter.',
+      message: 'Password must be at least 6 characters.',
     });
   }
 
-  setTimeout(() => {
-    const result = registerUser(name || '', email, password);
+  const result = registerUser(name || '', email, password);
 
-    if ('error' in result) {
-      return res.status(400).json({
-        success: false,
-        message: result.error,
-      });
-    }
-
-    return res.status(201).json({
-      success: true,
-      message: `Pendaftaran berhasil. Selamat datang sebagai ${
-        result.user.role === 'admin' ? 'Admin' : 'Member'
-      }!`,
-      user: result.user,
-      token: result.token,
+  if ('error' in result) {
+    return res.status(400).json({
+      success: false,
+      message: result.error,
     });
-  }, 200);
+  }
+
+  return res.status(201).json({
+    success: true,
+    message: `Sign up successful as ${result.user.role === 'superadmin' ? 'Super Admin' : result.user.role === 'admin' ? 'Admin' : 'Member'}!`,
+    user: result.user,
+    token: result.token,
+  });
 });
 
 // POST /api/auth/login
@@ -65,27 +61,25 @@ router.post('/login', (req: Request, res: Response) => {
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: 'Email dan password wajib diisi.',
+      message: 'Email and password are required.',
     });
   }
 
-  setTimeout(() => {
-    const authResult = authenticate(email, password);
+  const authResult = authenticate(email, password);
 
-    if (!authResult) {
-      return res.status(401).json({
-        success: false,
-        message: 'Email atau password salah. Silakan periksa kembali.',
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: 'Login berhasil.',
-      user: authResult.user,
-      token: authResult.token,
+  if (!authResult) {
+    return res.status(401).json({
+      success: false,
+      message: 'Incorrect email or password. Please try again.',
     });
-  }, 200);
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: 'Login successful.',
+    user: authResult.user,
+    token: authResult.token,
+  });
 });
 
 // GET /api/auth/me
@@ -94,7 +88,7 @@ router.get('/me', (req: Request, res: Response) => {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Token otentikasi tidak ditemukan.',
+      message: 'Authentication token not found.',
     });
   }
 
@@ -102,7 +96,7 @@ router.get('/me', (req: Request, res: Response) => {
   if (!user) {
     return res.status(401).json({
       success: false,
-      message: 'Sesi telah berakhir atau tidak valid.',
+      message: 'Session expired or invalid.',
     });
   }
 
@@ -116,20 +110,20 @@ router.get('/me', (req: Request, res: Response) => {
 router.post('/logout', (_req: Request, res: Response) => {
   return res.status(200).json({
     success: true,
-    message: 'Berhasil keluar dari sesi.',
+    message: 'Successfully logged out.',
   });
 });
 
-// GET /api/auth/users (Admin Only: list all users)
+// GET /api/auth/users (Super Admin & Admin: list all users)
 router.get('/users', (req: Request, res: Response) => {
   const token = extractToken(req);
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Tidak terotentikasi.' });
+    return res.status(401).json({ success: false, message: 'Unauthorized.' });
   }
 
   const requester = getUserByToken(token);
-  if (!requester || requester.role !== 'admin') {
-    return res.status(403).json({ success: false, message: 'Hanya admin yang dapat mengelola pengguna.' });
+  if (!requester || (requester.role !== 'superadmin' && requester.role !== 'admin')) {
+    return res.status(403).json({ success: false, message: 'Forbidden. Admin privileges required.' });
   }
 
   const users = getAllUsers();
@@ -139,36 +133,65 @@ router.get('/users', (req: Request, res: Response) => {
   });
 });
 
-// PATCH /api/auth/users/:id/role (Admin Only: change member <-> admin)
+// PATCH /api/auth/users/:id/role (Super Admin & Admin: change member <-> admin)
 router.patch('/users/:id/role', (req: Request, res: Response) => {
   const token = extractToken(req);
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Tidak terotentikasi.' });
+    return res.status(401).json({ success: false, message: 'Unauthorized.' });
   }
 
   const requester = getUserByToken(token);
-  if (!requester || requester.role !== 'admin') {
-    return res.status(403).json({ success: false, message: 'Hanya admin yang dapat mengubah role pengguna.' });
+  if (!requester || (requester.role !== 'superadmin' && requester.role !== 'admin')) {
+    return res.status(403).json({ success: false, message: 'Forbidden. Admin privileges required.' });
   }
 
   const userId = req.params.id;
-  const { role } = req.body as { role: UserRole };
+  const { role } = req.body as { role: 'admin' | 'member' };
 
   if (role !== 'admin' && role !== 'member') {
-    return res.status(400).json({ success: false, message: 'Role harus admin atau member.' });
+    return res.status(400).json({ success: false, message: 'Role must be admin or member.' });
   }
 
   const updated = updateUserRole(userId, role);
   if (!updated) {
     return res.status(400).json({
       success: false,
-      message: 'Gagal mengubah role atau akun pemilik tidak dapat diturunkan.',
+      message: 'Cannot modify Super Admin or user not found.',
     });
   }
 
   return res.status(200).json({
     success: true,
-    message: `Role pengguna berhasil diubah menjadi ${role}.`,
+    message: `User role successfully updated to ${role}.`,
+    users: getAllUsers(),
+  });
+});
+
+// DELETE /api/auth/users/:id (Super Admin ONLY: delete member or admin)
+router.delete('/users/:id', (req: Request, res: Response) => {
+  const token = extractToken(req);
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Unauthorized.' });
+  }
+
+  const requester = getUserByToken(token);
+  if (!requester || requester.role !== 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Only Super Admin can delete users.' });
+  }
+
+  const userId = req.params.id;
+  const deleted = deleteUser(userId);
+
+  if (!deleted) {
+    return res.status(400).json({
+      success: false,
+      message: 'Cannot delete Super Admin account or user not found.',
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: 'User successfully removed.',
     users: getAllUsers(),
   });
 });
@@ -179,7 +202,7 @@ router.post('/change-password', (req: Request, res: Response) => {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Tidak memiliki otorisasi.',
+      message: 'Unauthorized.',
     });
   }
 
@@ -187,7 +210,7 @@ router.post('/change-password', (req: Request, res: Response) => {
   if (!user) {
     return res.status(401).json({
       success: false,
-      message: 'Sesi tidak valid.',
+      message: 'Invalid session.',
     });
   }
 
@@ -195,7 +218,7 @@ router.post('/change-password', (req: Request, res: Response) => {
   if (!oldPassword || !newPassword || newPassword.length < 6) {
     return res.status(400).json({
       success: false,
-      message: 'Password baru minimal harus 6 karakter.',
+      message: 'New password must be at least 6 characters.',
     });
   }
 
@@ -203,13 +226,13 @@ router.post('/change-password', (req: Request, res: Response) => {
   if (!success) {
     return res.status(400).json({
       success: false,
-      message: 'Password lama tidak sesuai.',
+      message: 'Incorrect current password.',
     });
   }
 
   return res.status(200).json({
     success: true,
-    message: 'Password berhasil diperbarui.',
+    message: 'Password successfully updated.',
   });
 });
 

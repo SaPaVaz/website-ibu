@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { authService, UserProfile, UserRole } from '../services/auth';
+import { authService, UserProfile } from '../services/auth';
 
 interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
+  isSuperAdmin: boolean;
   isAdmin: boolean;
   isMember: boolean;
   isLoading: boolean;
@@ -26,7 +27,8 @@ interface AuthContextType {
   closeMemberModal: () => void;
   usersList: UserProfile[];
   refreshUsers: () => Promise<void>;
-  changeUserRole: (userId: string, newRole: UserRole) => Promise<{ success: boolean; message?: string }>;
+  changeUserRole: (userId: string, newRole: 'admin' | 'member') => Promise<{ success: boolean; message?: string }>;
+  deleteUserAccount: (userId: string) => Promise<{ success: boolean; message?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,7 +43,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isMemberModalOpen, setIsMemberModalOpen] = useState<boolean>(false);
   const [usersList, setUsersList] = useState<UserProfile[]>([]);
 
-  // Check existing session on mount
   useEffect(() => {
     let isMounted = true;
     const verifySession = async () => {
@@ -71,7 +72,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   useEffect(() => {
-    if (user && user.role === 'admin' && isAdminPanelOpen) {
+    if (user && (user.role === 'superadmin' || user.role === 'admin') && isAdminPanelOpen) {
       refreshUsers();
     }
   }, [user, isAdminPanelOpen, refreshUsers]);
@@ -85,7 +86,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setIsLoginModalOpen(false);
         return { success: true, message: result.message };
       }
-      return { success: false, message: result.message || 'Login gagal.' };
+      return { success: false, message: result.message || 'Login failed.' };
     } finally {
       setIsLoading(false);
     }
@@ -100,7 +101,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setIsLoginModalOpen(false);
         return { success: true, message: result.message };
       }
-      return { success: false, message: result.message || 'Pendaftaran gagal.' };
+      return { success: false, message: result.message || 'Sign up failed.' };
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +124,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return await authService.changePassword(oldPass, newPass);
   };
 
-  const changeUserRole = async (userId: string, newRole: UserRole) => {
+  const changeUserRole = async (userId: string, newRole: 'admin' | 'member') => {
     const res = await authService.updateUserRole(userId, newRole);
     if (res.success) {
       if (res.users) {
@@ -131,7 +132,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } else {
         await refreshUsers();
       }
-      // If the modified user is currently logged in, update their session too
       if (user && user.id === userId) {
         setUser({ ...user, role: newRole });
       }
@@ -139,13 +139,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return res;
   };
 
+  const deleteUserAccount = async (userId: string) => {
+    const res = await authService.deleteUser(userId);
+    if (res.success) {
+      if (res.users) {
+        setUsersList(res.users);
+      } else {
+        await refreshUsers();
+      }
+    }
+    return res;
+  };
+
+  const isSuperAdmin = user?.role === 'superadmin' || user?.email.toLowerCase() === 'safarazqiaa@gmail.com';
+  const isAdmin = isSuperAdmin || user?.role === 'admin';
+  const isMember = !isAdmin && user !== null;
+
   return (
     <AuthContext.Provider
       value={{
         user,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'admin',
-        isMember: user?.role === 'member',
+        isSuperAdmin,
+        isAdmin,
+        isMember,
         isLoading,
         login,
         signup,
@@ -170,6 +187,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         usersList,
         refreshUsers,
         changeUserRole,
+        deleteUserAccount,
       }}
     >
       {children}
