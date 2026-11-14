@@ -14,6 +14,7 @@ import { AuthGatewayScreen } from './components/AuthGatewayScreen';
 import { LogoutConfirmModal } from './components/LogoutConfirmModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
 import { MemberModal } from './components/MemberModal';
+import { CursorTrail } from './components/CursorTrail';
 
 import { CategoryCatalogPage } from './components/CategoryCatalogPage';
 
@@ -127,6 +128,7 @@ export default function App() {
   return (
     <AuthProvider>
       <StoreStatusProvider>
+        <CursorTrail />
         <MainApp />
       </StoreStatusProvider>
     </AuthProvider>
