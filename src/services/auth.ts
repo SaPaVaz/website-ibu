@@ -296,7 +296,22 @@ export const authService = {
 
   async getUsers(): Promise<UserProfile[]> {
     const token = this.getToken();
-    if (!token) return [];
+    const stored = getStoredUsersList();
+
+    // Trigger sync to ensure server disk and client storage never lose any registered account
+    if (stored.length > 0) {
+      try {
+        fetch('/api/auth/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ users: stored }),
+        }).catch(() => {});
+      } catch {
+        // ignore
+      }
+    }
+
+    if (!token) return stored;
 
     try {
       const response = await fetch('/api/auth/users', {
@@ -315,15 +330,23 @@ export const authService = {
               u.email.toLowerCase() !== 'admin@warungpojokaro.com' &&
               u.email.toLowerCase() !== 'rahmat.hidayat@gmail.com'
           );
-          saveStoredUsersList(cleanUsers);
-          return cleanUsers;
+
+          // Merge users so no account is ever lost across code updates
+          const merged = [...cleanUsers];
+          for (const s of stored) {
+            if (!merged.some((m) => m.email.toLowerCase() === s.email.toLowerCase())) {
+              merged.push(s);
+            }
+          }
+          saveStoredUsersList(merged);
+          return merged;
         }
       }
     } catch {
       // ignore
     }
 
-    return getStoredUsersList();
+    return stored;
   },
 
   async updateUserRole(userId: string, newRole: UserRole): Promise<{ success: boolean; users?: UserProfile[]; message?: string }> {

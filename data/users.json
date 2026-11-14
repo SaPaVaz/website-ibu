@@ -4,8 +4,17 @@
     "email": "safarazqiaa@gmail.com",
     "name": "Safaraz Qia (Owner)",
     "role": "superadmin",
-    "salt": "2ba12740474a28fa2d9564ed45df3f39",
-    "hash": "ba3e39c6f827b3d0f0a5dfc9df5d481cee9ceb37cb1867013aaca754632b1bece027b1cbd20b49bf97253e4257fc1013ab1ab966e81675b0abb3c2c15669cdb7",
+    "salt": "e05e11baf58b3a59fcb09f36e88419ab",
+    "hash": "fe43ee5e0939cbf84b6beeb56644746ba566162e719ea33c8b44c6e3b8392b841c088860feaa60b6e1df7ab9202b1a16b4660f1f19aa397b09a24d1b017cebec",
     "createdAt": "2026-10-31T04:09:09.128Z"
+  },
+  {
+    "id": "usr_1793509658951_p4nrj",
+    "email": "qiasafaraz@gmail.com",
+    "name": "qiasafaraz",
+    "role": "member",
+    "salt": "c7702c69b4aa27728c6bf62ae27fbe4e",
+    "hash": "2d9f721f99ea1449bf2e8acb4c48417b6c0dac40556ae2e2dd63a1400283a5b6e34c1e75c38c8f49c9c779a32c53f4cb7fb00a2e720ae04de6aea3fffe7d2eaa",
+    "createdAt": "2026-11-01T05:07:38.951Z"
   }
 ]

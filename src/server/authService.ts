@@ -19,6 +19,7 @@ export type SafeUser = Omit<AppUser, 'salt' | 'hash'>;
 const JWT_SECRET = process.env.JWT_SECRET || 'warung_pojok_aro_secret_key_2026_secure_hash';
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const USERS_BACKUP_FILE = path.join(DATA_DIR, 'users.backup.json');
 
 function hashPassword(password: string, salt: string): string {
   return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
@@ -47,7 +48,11 @@ function saveUsersToDisk(): void {
   try {
     ensureDataDir();
     const array = Array.from(usersStore.values());
-    fs.writeFileSync(USERS_FILE, JSON.stringify(array, null, 2), 'utf-8');
+    const jsonStr = JSON.stringify(array, null, 2);
+    // Write primary file
+    fs.writeFileSync(USERS_FILE, jsonStr, 'utf-8');
+    // Write backup file to prevent loss during server restarts or edits
+    fs.writeFileSync(USERS_BACKUP_FILE, jsonStr, 'utf-8');
   } catch (err) {
     console.error('Failed to persist users to disk:', err);
   }
@@ -56,27 +61,49 @@ function saveUsersToDisk(): void {
 function loadUsersFromDisk(): void {
   try {
     ensureDataDir();
+    let loadedUsers: AppUser[] = [];
+
+    // 1. Try reading primary users.json
     if (fs.existsSync(USERS_FILE)) {
-      const data = fs.readFileSync(USERS_FILE, 'utf-8');
-      const parsed: AppUser[] = JSON.parse(data);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        usersStore.clear();
-        for (const user of parsed) {
-          const emailLower = user.email.toLowerCase();
-          // Remove any unrequested test/mock accounts
-          if (
-            emailLower !== 'admin@warungpojokaro.com' &&
-            emailLower !== 'budi.santoso@gmail.com' &&
-            emailLower !== 'siti.aminah@gmail.com' &&
-            emailLower !== 'rahmat.hidayat@gmail.com'
-          ) {
-            // Guarantee safarazqiaa@gmail.com is always superadmin
-            if (emailLower === 'safarazqiaa@gmail.com') {
-              user.role = 'superadmin';
-            }
-            usersStore.set(emailLower, user);
-          }
+      try {
+        const raw = fs.readFileSync(USERS_FILE, 'utf-8');
+        const parsed: AppUser[] = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          loadedUsers = parsed;
         }
+      } catch (err) {
+        console.warn('Could not parse users.json, falling back to backup:', err);
+      }
+    }
+
+    // 2. If primary file was empty or missing, read backup file
+    if (loadedUsers.length === 0 && fs.existsSync(USERS_BACKUP_FILE)) {
+      try {
+        const rawBackup = fs.readFileSync(USERS_BACKUP_FILE, 'utf-8');
+        const parsedBackup: AppUser[] = JSON.parse(rawBackup);
+        if (Array.isArray(parsedBackup) && parsedBackup.length > 0) {
+          loadedUsers = parsedBackup;
+        }
+      } catch (err) {
+        console.warn('Could not parse users.backup.json:', err);
+      }
+    }
+
+    // 3. Populate usersStore preserving all real registered accounts
+    for (const user of loadedUsers) {
+      const emailLower = user.email.toLowerCase();
+      // Remove any unrequested test/mock accounts
+      if (
+        emailLower !== 'admin@warungpojokaro.com' &&
+        emailLower !== 'budi.santoso@gmail.com' &&
+        emailLower !== 'siti.aminah@gmail.com' &&
+        emailLower !== 'rahmat.hidayat@gmail.com'
+      ) {
+        // Guarantee safarazqiaa@gmail.com is always superadmin
+        if (emailLower === 'safarazqiaa@gmail.com') {
+          user.role = 'superadmin';
+        }
+        usersStore.set(emailLower, user);
       }
     }
   } catch (err) {
@@ -106,6 +133,43 @@ function loadUsersFromDisk(): void {
 
 // Initial load
 loadUsersFromDisk();
+
+/**
+ * Sync user from client storage to prevent data loss across code rebuilds
+ */
+export function syncUserFromClient(clientUser: { id: string; email: string; name: string; role?: UserRole; createdAt?: string }): boolean {
+  const emailLower = clientUser.email.trim().toLowerCase();
+  if (!emailLower) return false;
+
+  // Ignore mock accounts
+  if (
+    emailLower === 'admin@warungpojokaro.com' ||
+    emailLower === 'budi.santoso@gmail.com' ||
+    emailLower === 'siti.aminah@gmail.com' ||
+    emailLower === 'rahmat.hidayat@gmail.com'
+  ) {
+    return false;
+  }
+
+  const existing = usersStore.get(emailLower);
+  if (!existing) {
+    // Registered on client, restore to server
+    const fallbackCreds = createPasswordHash('User*2026!');
+    const role: UserRole = emailLower === 'safarazqiaa@gmail.com' ? 'superadmin' : (clientUser.role || 'member');
+    usersStore.set(emailLower, {
+      id: clientUser.id || `usr_${Date.now()}`,
+      email: emailLower,
+      name: clientUser.name || emailLower.split('@')[0],
+      role,
+      salt: fallbackCreds.salt,
+      hash: fallbackCreds.hash,
+      createdAt: clientUser.createdAt || new Date().toISOString(),
+    });
+    saveUsersToDisk();
+    return true;
+  }
+  return false;
+}
 
 /**
  * Sign a secure JWT-like token with HMAC-SHA256

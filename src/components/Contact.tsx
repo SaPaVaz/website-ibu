@@ -14,7 +14,7 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section className="w-full py-16 sm:py-20 border-b border-theme bg-surface transition-colors overflow-hidden">
+    <section id="kontak" className="w-full py-16 sm:py-20 border-b border-theme bg-surface transition-colors overflow-hidden">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -37,14 +37,14 @@ export const Contact: React.FC = () => {
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="rounded-2xl border border-theme bg-card-theme p-8 sm:p-10 max-w-xl mx-auto shadow-xs space-y-6"
+          className="rounded-2xl border border-theme bg-card-theme p-5 sm:p-10 max-w-xl mx-auto shadow-xs space-y-5 sm:space-y-6"
         >
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-muted block mb-1">
               Nomor WhatsApp
             </span>
             <div className="flex items-center justify-center gap-3">
-              <span className="font-mono text-2xl sm:text-3xl font-bold text-heading tracking-tight">
+              <span className="font-mono text-xl sm:text-3xl font-bold text-heading tracking-tight">
                 {phoneNumber}
               </span>
               <button

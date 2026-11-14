@@ -9,51 +9,60 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { IntroSplash } from './components/IntroSplash';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { StoreStatusProvider } from './context/StoreStatusContext';
 import { AuthGatewayScreen } from './components/AuthGatewayScreen';
 import { LogoutConfirmModal } from './components/LogoutConfirmModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
 import { MemberModal } from './components/MemberModal';
 
+import { CategoryCatalogPage } from './components/CategoryCatalogPage';
+
 function MainApp() {
   const { isAuthenticated, isLoading } = useAuth();
   const [showIntro, setShowIntro] = useState(true);
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('warung_pojok_aro_theme');
-      if (savedTheme === 'dark' || savedTheme === 'light') {
-        return savedTheme;
-      }
-    }
-    return 'light'; // Light Mode is the default
-  });
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.setAttribute('data-theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      root.setAttribute('data-theme', 'light');
-    }
-    try {
-      localStorage.setItem('warung_pojok_aro_theme', theme);
-    } catch {
-      // ignore storage access errors
-    }
-  }, [theme]);
+    root.classList.add('dark');
+    root.setAttribute('data-theme', 'dark');
+  }, []);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  // Sync browser back/forward buttons with selectedCategory
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state && typeof e.state.category === 'string') {
+        setSelectedCategory(e.state.category);
+      } else {
+        setSelectedCategory(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleSelectCategory = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    window.history.pushState({ category: categoryId }, '', `#katalog-${categoryId}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackToHome = () => {
+    setSelectedCategory(null);
+    if (window.location.hash.startsWith('#katalog')) {
+      window.history.pushState(null, '', window.location.pathname);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // 1. Initial session checking indicator
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FCF9EA] dark:bg-[#181614] transition-colors">
+      <div className="min-h-screen flex items-center justify-center bg-[#181614]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-3 border-[#DB9558] border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-semibold text-[#6B6357] dark:text-[#A8BBA3]">
+          <span className="text-xs font-semibold text-[#A8BBA3]">
             Memuat Warung Pojok Aro...
           </span>
         </div>
@@ -63,25 +72,48 @@ function MainApp() {
 
   // 2. Gateway protection: when not authenticated, show the dedicated Auth Gateway Screen
   if (!isAuthenticated) {
-    return <AuthGatewayScreen theme={theme} onToggleTheme={toggleTheme} />;
+    return <AuthGatewayScreen />;
   }
 
-  // 3. Authenticated: enter the full Beranda Website
+  // 3. Authenticated: enter the full Beranda Website or Catalog View
   return (
-    <div className="min-h-screen flex flex-col bg-page text-heading transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-page text-heading">
       {/* Opening Welcome Animation */}
       {showIntro && <IntroSplash onFinish={() => setShowIntro(false)} />}
 
-      <Header theme={theme} onToggleTheme={toggleTheme} onReplayIntro={() => setShowIntro(true)} />
+      <Header
+        onHomeClick={handleBackToHome}
+        onReplayIntro={() => {
+          setSelectedCategory(null);
+          setShowIntro(true);
+        }}
+      />
+
       <main className="flex-grow">
-        <Hero />
-        <Categories />
-        <About />
-        <OpeningHours />
-        <Location />
-        <Contact />
+        {selectedCategory ? (
+          <CategoryCatalogPage
+            categoryId={selectedCategory}
+            onBack={handleBackToHome}
+            onSelectCategory={handleSelectCategory}
+          />
+        ) : (
+          <>
+            <Hero />
+            <Categories onSelectCategory={handleSelectCategory} />
+            <About />
+            <OpeningHours />
+            <Location />
+            <Contact />
+          </>
+        )}
       </main>
-      <Footer onReplayIntro={() => setShowIntro(true)} />
+
+      <Footer
+        onReplayIntro={() => {
+          setSelectedCategory(null);
+          setShowIntro(true);
+        }}
+      />
 
       {/* Authentication & Profile Modals */}
       <LogoutConfirmModal />
@@ -94,7 +126,9 @@ function MainApp() {
 export default function App() {
   return (
     <AuthProvider>
-      <MainApp />
+      <StoreStatusProvider>
+        <MainApp />
+      </StoreStatusProvider>
     </AuthProvider>
   );
 }

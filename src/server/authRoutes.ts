@@ -7,6 +7,7 @@ import {
   updateUserRole,
   deleteUser,
   updatePassword,
+  syncUserFromClient,
 } from './authService.js';
 
 const router = Router();
@@ -18,6 +19,22 @@ function extractToken(req: Request): string | null {
   }
   return null;
 }
+
+// POST /api/auth/sync (Persist and sync users from client localStorage)
+router.post('/sync', (req: Request, res: Response) => {
+  const { users } = req.body;
+  if (Array.isArray(users)) {
+    for (const u of users) {
+      if (u && typeof u.email === 'string') {
+        syncUserFromClient(u);
+      }
+    }
+  }
+  return res.status(200).json({
+    success: true,
+    users: getAllUsers(),
+  });
+});
 
 // POST /api/auth/signup
 router.post('/signup', (req: Request, res: Response) => {

@@ -18,14 +18,14 @@ export const Location: React.FC = () => {
   };
 
   return (
-    <section className="w-full py-16 sm:py-20 border-b border-theme bg-page transition-colors overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+    <section id="lokasi" className="w-full py-12 sm:py-20 border-b border-theme bg-page transition-colors overflow-hidden">
+      <div className="max-w-6xl mx-auto px-3.5 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="max-w-2xl mb-10 sm:mb-14"
+          className="max-w-2xl mb-8 sm:mb-14"
         >
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted mb-2">
             <MapPin className="w-4 h-4" />
@@ -36,16 +36,16 @@ export const Location: React.FC = () => {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
           {/* Address Details Card */}
           <motion.div
             initial={{ opacity: 0, x: -25 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-6 space-y-6"
+            className="lg:col-span-6 space-y-4 sm:space-y-6"
           >
-            <div className="rounded-2xl border border-theme bg-card-theme p-6 sm:p-8 space-y-6 shadow-xs">
+            <div className="rounded-2xl border border-theme bg-card-theme p-4 sm:p-8 space-y-4 sm:space-y-6 shadow-xs">
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-2">
                   Alamat Lengkap

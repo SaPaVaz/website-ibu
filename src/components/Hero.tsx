@@ -8,43 +8,43 @@ export const Hero: React.FC = () => {
     'https://www.google.com/maps/place/WARUNG+POJOK+ARO/@-7.3394647,109.8894942,780a,75y,76.33h,90t/data=!3m7!1e1!3m5!1sjZ2wEhKqqprd89NWV1FJvA!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D0%26panoid%3DjZ2wEhKqqprd89NWV1FJvA%26yaw%3D76.33181!7i16384!8i8192!4m6!3m5!1s0x2e7aa1d123fb6241:0xc0a460add977a02f!8m2!3d-7.3394616!4d109.8896555!16s%2Fg%2F11fhs4wnl_';
 
   return (
-    <section className="relative w-full pt-8 pb-16 sm:pt-14 sm:pb-20 border-b border-theme bg-page transition-colors overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+    <section className="relative w-full pt-6 pb-12 sm:pt-14 sm:pb-20 border-b border-theme bg-page transition-colors overflow-hidden">
+      <div className="max-w-6xl mx-auto px-3.5 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
           {/* Text Content with entrance animation */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-6 flex flex-col items-start space-y-5 sm:space-y-6"
+            className="lg:col-span-6 flex flex-col items-start space-y-4 sm:space-y-6"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-theme bg-surface text-xs font-medium text-muted shadow-2xs">
               <Store className="w-3.5 h-3.5 text-heading" />
               <span>Wonosobo, Jawa Tengah</span>
             </div>
 
-            <div className="space-y-3">
-              <h1 className="text-3xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-heading leading-[1.12]">
+            <div className="space-y-2 sm:space-y-3">
+              <h1 className="text-3xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-heading leading-[1.15]">
                 Warung Pojok Aro
               </h1>
-              <p className="text-lg sm:text-xl font-medium text-heading/85">
+              <p className="text-base sm:text-xl font-medium text-heading/85">
                 Menyediakan Kebutuhan Harian Anda
               </p>
             </div>
 
-            <p className="text-base sm:text-lg text-muted max-w-xl leading-relaxed">
+            <p className="text-sm sm:text-lg text-muted max-w-xl leading-relaxed">
               Temukan berbagai kebutuhan sehari-hari Anda dalam satu tempat. Praktis, dekat, dan mudah dijangkau dengan stok lengkap dan harga bersahabat.
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto pt-1 sm:pt-2">
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-lg text-sm sm:text-base font-medium shadow-xs"
+                className="btn-primary inline-flex items-center justify-center gap-2.5 px-5 py-3 sm:px-6 sm:py-3.5 rounded-xl text-sm sm:text-base font-semibold shadow-xs active:scale-98"
               >
-                <MessageCircle className="w-5 h-5" />
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span>Hubungi Kami</span>
               </a>
 
@@ -52,9 +52,9 @@ export const Hero: React.FC = () => {
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-secondary inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-lg text-sm sm:text-base font-medium shadow-xs"
+                className="btn-secondary inline-flex items-center justify-center gap-2.5 px-5 py-3 sm:px-6 sm:py-3.5 rounded-xl text-sm sm:text-base font-semibold shadow-xs active:scale-98"
               >
-                <MapPin className="w-5 h-5 text-muted" />
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-muted shrink-0" />
                 <span>Lihat Lokasi</span>
               </a>
             </div>
@@ -62,7 +62,7 @@ export const Hero: React.FC = () => {
 
           {/* 2 Real Photos with staggered slide-in animation */}
           <div className="lg:col-span-6 w-full">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
               {/* Photo 1: Tampak Depan Toko */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.92, y: 20 }}

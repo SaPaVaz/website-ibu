@@ -33,7 +33,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({ onFinish }) => {
           key="intro-splash"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, y: -24, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FCF9EA] dark:bg-[#181614] px-6 select-none cursor-default overflow-hidden"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#181614] px-6 select-none cursor-default overflow-hidden"
         >
           {/* Ambient Warm Gradient Orbs matching palette */}
           <motion.div
@@ -56,7 +56,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({ onFinish }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.3 }}
-            className="absolute top-6 right-6 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-[#6B6357] dark:text-[#A8BBA3] hover:text-[#2B2520] dark:hover:text-white bg-white/60 dark:bg-neutral-800/60 backdrop-blur-sm border border-[#E3DCBE] dark:border-neutral-700 transition-colors shadow-xs"
+            className="absolute top-5 right-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#A8BBA3] hover:text-white bg-neutral-800/70 backdrop-blur-sm border border-neutral-700 transition-colors shadow-xs cursor-pointer"
             aria-label="Lewati animasi sambutan"
           >
             <span>Lewati</span>
@@ -85,7 +85,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({ onFinish }) => {
               />
 
               {/* Logo Card */}
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white p-1 shadow-lg border border-[#E3DCBE] dark:border-neutral-700 flex items-center justify-center">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white p-1 shadow-lg border border-neutral-700 flex items-center justify-center">
                 <img
                   src={logoImageSrc}
                   alt="Logo Warung Pojok Aro"
@@ -99,7 +99,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({ onFinish }) => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25, duration: 0.5 }}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#97A87A]/15 border border-[#97A87A]/30 text-xs font-semibold text-[#97A87A] dark:text-[#A8BBA3] mb-3"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#97A87A]/15 border border-[#97A87A]/30 text-xs font-semibold text-[#A8BBA3] mb-3"
             >
               <Sparkles className="w-3 h-3 text-[#DB9558]" />
               <span>Selamat Datang</span>
@@ -110,7 +110,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({ onFinish }) => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.5 }}
-              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#2B2520] dark:text-[#FCF9EA] uppercase"
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#FCF9EA] uppercase"
             >
               WARUNG POJOK ARO
             </motion.h1>
@@ -120,7 +120,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({ onFinish }) => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55, duration: 0.5 }}
-              className="text-xs sm:text-sm text-[#6B6357] dark:text-[#A8BBA3] font-medium mt-1.5"
+              className="text-xs sm:text-sm text-[#A8BBA3] font-medium mt-1.5"
             >
               Menyediakan Kebutuhan Harian Anda &bull; Wonosobo
             </motion.p>
@@ -130,7 +130,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({ onFinish }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.4 }}
-              className="w-36 h-1.5 bg-[#E3DCBE] dark:bg-neutral-800 rounded-full mt-7 overflow-hidden"
+              className="w-36 h-1.5 bg-neutral-800 rounded-full mt-7 overflow-hidden"
             >
               <motion.div
                 initial={{ width: '0%' }}

@@ -3,18 +3,43 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './src/server/authRoutes.js';
+import storeRoutes from './src/server/storeRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function resolvePort(): number {
+  const portIndex = process.argv.indexOf('--port');
+  if (portIndex !== -1 && process.argv[portIndex + 1]) {
+    const cliPort = Number(process.argv[portIndex + 1]);
+    if (!Number.isNaN(cliPort) && cliPort > 0) return cliPort;
+  }
+  const portEq = process.argv.find((arg) => arg.startsWith('--port='));
+  if (portEq) {
+    const cliPort = Number(portEq.split('=')[1]);
+    if (!Number.isNaN(cliPort) && cliPort > 0) return cliPort;
+  }
+  const envPort = Number(process.env.PORT);
+  const nginxPort = Number(process.env.NGINX_PORT);
+  if (!Number.isNaN(envPort) && envPort > 0 && envPort !== nginxPort) {
+    return envPort;
+  }
+  const defaultAppPort = Number(process.env.DEFAULT_APP_PORT);
+  if (!Number.isNaN(defaultAppPort) && defaultAppPort > 0) {
+    return defaultAppPort;
+  }
+  return 3000;
+}
+
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = resolvePort();
 
   app.use(express.json());
 
-  // Mount backend authentication API routes
+  // Mount backend authentication and store status API routes
   app.use('/api/auth', authRoutes);
+  app.use('/api/store', storeRoutes);
 
   // Health check
   app.get('/api/health', (_req, res) => {

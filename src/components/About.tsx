@@ -4,9 +4,9 @@ import { motion } from 'motion/react';
 
 export const About: React.FC = () => {
   return (
-    <section className="w-full py-16 sm:py-20 border-b border-theme bg-page transition-colors overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+    <section className="w-full py-12 sm:py-20 border-b border-theme bg-page transition-colors overflow-hidden">
+      <div className="max-w-6xl mx-auto px-3.5 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
           {/* 2 Real Photos: Etalase Alat Tulis & Rak Perlengkapan Harian */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -15,7 +15,7 @@ export const About: React.FC = () => {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-6 order-2 lg:order-1 w-full"
           >
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
               {/* Photo 1: Etalase Kaca Alat Tulis & Aksesori */}
               <div className="group relative rounded-2xl overflow-hidden border border-theme shadow-md bg-surface aspect-3/4 sm:aspect-4/5 max-h-[480px]">
                 <img

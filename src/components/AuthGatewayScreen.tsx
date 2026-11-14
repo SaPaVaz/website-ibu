@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Eye, EyeOff, Loader2, AlertCircle, Sun, Moon, UserPlus, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Loader2, AlertCircle, UserPlus, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { LogoImage } from './Logo';
 
-interface AuthGatewayScreenProps {
-  theme?: 'light' | 'dark';
-  onToggleTheme?: () => void;
-}
-
-export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'light', onToggleTheme }) => {
+export const AuthGatewayScreen: React.FC = () => {
   const { login, signup } = useAuth();
   const [tab, setTab] = useState<'login' | 'signup'>('login');
 
@@ -77,75 +72,50 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between bg-[#FCF9EA] dark:bg-[#151311] text-[#2B2520] dark:text-[#FCF9EA] transition-colors p-4 sm:p-6 md:p-8 relative select-none">
-      {/* Top Bar Branding & Theme Switcher */}
-      <header className="relative z-10 w-full max-w-4xl mx-auto flex items-center justify-between py-2 border-b border-[#E3DCBE] dark:border-neutral-800 pb-3">
-        <div className="flex items-center gap-3">
-          <LogoImage sizeClass="w-9 h-9" />
-          <div className="flex flex-col leading-tight">
-            <span className="font-bold tracking-tight text-sm uppercase text-[#2B2520] dark:text-neutral-100">
+    <div className="min-h-screen w-full flex flex-col justify-between bg-page text-heading p-3.5 sm:p-6 md:p-8 relative select-none">
+      {/* Top Bar Branding */}
+      <header className="relative z-10 w-full max-w-4xl mx-auto flex items-center justify-between gap-2 py-2.5 sm:py-3 border-b border-theme pb-3.5 sm:pb-4">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <LogoImage sizeClass="w-8 h-8 sm:w-9 sm:h-9" />
+          <div className="flex flex-col leading-tight min-w-0">
+            <span className="font-bold tracking-tight text-xs sm:text-sm uppercase text-heading truncate">
               WARUNG POJOK ARO
             </span>
-            <span className="text-xs text-[#6B6357] dark:text-[#A8BBA3]">
+            <span className="text-[11px] sm:text-xs text-muted truncate">
               Daily Groceries &bull; Mojotengah, Wonosobo
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Light / Dark Mode Toggle Button */}
-          {onToggleTheme && (
-            <button
-              type="button"
-              onClick={onToggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 bg-white/80 dark:bg-neutral-800/80 hover:bg-white dark:hover:bg-neutral-700 transition-all text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#DB9558] cursor-pointer shadow-2xs"
-            >
-              {theme === 'dark' ? (
-                <>
-                  <Sun className="w-3.5 h-3.5 text-[#DB9558]" />
-                  <span>Light Mode</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-3.5 h-3.5 text-[#97A87A]" />
-                  <span>Dark Mode</span>
-                </>
-              )}
-            </button>
-          )}
-
-          <span className="hidden sm:inline-block text-xs font-semibold px-3 py-1.5 rounded-full border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 bg-white/80 dark:bg-neutral-800/80">
-            Mojotengah
-          </span>
-        </div>
+        <span className="hidden sm:inline-block text-xs font-semibold px-3 py-1 rounded-lg border border-theme text-heading bg-surface shrink-0">
+          Mojotengah
+        </span>
       </header>
 
-      {/* Main Gateway Card */}
-      <main className="relative z-10 w-full max-w-md mx-auto my-auto py-8">
+      {/* Main Gateway Card matching Dark Theme */}
+      <main className="relative z-10 w-full max-w-md mx-auto my-auto py-5 sm:py-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#1E1B18] p-6 sm:p-8 shadow-xl"
+          className="rounded-2xl border border-theme bg-card-theme p-5 sm:p-8 shadow-xl"
         >
           {/* Logo & Clean Title */}
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 mx-auto mb-3">
+          <div className="text-center mb-5 sm:mb-6">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-3">
               <LogoImage sizeClass="w-full h-full" />
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 uppercase">
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-heading uppercase">
               Warung Pojok Aro
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 mt-1 leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted mt-1 leading-relaxed">
               Login or create an account to access the store.
             </p>
           </div>
 
-          {/* Toggle Tabs: High-Contrast and Crystal Clear in BOTH Light & Dark Modes */}
-          <div className="grid grid-cols-2 p-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 mb-6 gap-2">
+          {/* Toggle Tabs */}
+          <div className="grid grid-cols-2 p-1.5 rounded-xl bg-surface border border-theme mb-5 sm:mb-6 gap-2">
             <button
               type="button"
               onClick={() => {
@@ -156,7 +126,7 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
               className={`py-2.5 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all cursor-pointer text-center ${
                 tab === 'login'
                   ? 'bg-[#DB9558] text-white shadow-sm ring-1 ring-[#DB9558]'
-                  : 'bg-white/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 hover:bg-white dark:hover:bg-neutral-600 border border-neutral-300 dark:border-neutral-600'
+                  : 'bg-card-theme text-heading hover:bg-surface border border-theme'
               }`}
             >
               Login
@@ -172,7 +142,7 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
               className={`py-2.5 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all cursor-pointer text-center ${
                 tab === 'signup'
                   ? 'bg-[#DB9558] text-white shadow-sm ring-1 ring-[#DB9558]'
-                  : 'bg-white/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 hover:bg-white dark:hover:bg-neutral-600 border border-neutral-300 dark:border-neutral-600'
+                  : 'bg-card-theme text-heading hover:bg-surface border border-theme'
               }`}
             >
               Sign Up
@@ -190,16 +160,16 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
               >
                 <div className={`p-3.5 rounded-xl border text-xs sm:text-sm leading-snug space-y-2 ${
                   errorReason === 'NOT_REGISTERED'
-                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800/80 text-amber-900 dark:text-amber-200'
-                    : 'bg-red-50 dark:bg-red-950/40 border-red-300 dark:border-red-900/60 text-red-700 dark:text-red-300'
+                    ? 'bg-surface border-[#DB9558]/60 text-heading'
+                    : 'bg-red-950/40 border border-red-900/60 text-red-300'
                 }`}>
                   <div className="flex items-start gap-2.5">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <AlertCircle className={`w-4 h-4 shrink-0 mt-0.5 ${errorReason === 'NOT_REGISTERED' ? 'text-[#DB9558]' : ''}`} />
                     <div className="flex-1">
                       {errorReason === 'NOT_REGISTERED' ? (
                         <>
-                          <strong className="block font-bold">Account Not Registered</strong>
-                          <span>{errorMessage}</span>
+                          <strong className="block font-bold text-heading">Account Not Registered</strong>
+                          <span className="text-muted">{errorMessage}</span>
                         </>
                       ) : (
                         <span>{errorMessage}</span>
@@ -213,7 +183,7 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
                       <button
                         type="button"
                         onClick={handleSwitchToSignup}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#DB9558] hover:bg-[#c48145] text-white shadow-xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#DB9558] hover:bg-[#C98246] text-white shadow-xs transition-colors cursor-pointer"
                       >
                         <UserPlus className="w-3.5 h-3.5" />
                         <span>Sign Up with this email</span>
@@ -226,12 +196,12 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
             )}
           </AnimatePresence>
 
-          {/* Form with Clean High-Contrast Inputs without Clutter */}
+          {/* Form with High-Contrast Inputs */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name (Sign Up Only) */}
             {tab === 'signup' && (
               <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+                <label className="block text-xs font-bold uppercase tracking-wider text-heading">
                   Full Name
                 </label>
                 <input
@@ -241,14 +211,14 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your full name"
                   disabled={isSubmitting}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-theme bg-surface text-heading text-sm placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
                 />
               </div>
             )}
 
             {/* Email Address */}
             <div className="space-y-1.5 text-left">
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+              <label className="block text-xs font-bold uppercase tracking-wider text-heading">
                 Email Address
               </label>
               <input
@@ -259,13 +229,13 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@email.com"
                 disabled={isSubmitting}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-theme bg-surface text-heading text-sm placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
               />
             </div>
 
             {/* Password */}
             <div className="space-y-1.5 text-left">
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+              <label className="block text-xs font-bold uppercase tracking-wider text-heading">
                 Password
               </label>
               <div className="relative flex items-center">
@@ -277,14 +247,14 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={tab === 'signup' ? 'Minimum 6 characters' : 'Enter your password'}
                   disabled={isSubmitting}
-                  className="w-full pl-3.5 pr-11 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
+                  className="w-full pl-3.5 pr-11 py-2.5 rounded-xl border border-theme bg-surface text-heading text-sm placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                   disabled={isSubmitting}
-                  className="absolute right-3.5 p-1 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors cursor-pointer"
+                  className="absolute right-3.5 p-1 text-muted hover:text-heading transition-colors cursor-pointer"
                   title={showPassword ? 'Hide password' : 'Show password'}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
@@ -296,7 +266,7 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
             {/* Confirm Password (Sign Up Only) */}
             {tab === 'signup' && (
               <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+                <label className="block text-xs font-bold uppercase tracking-wider text-heading">
                   Confirm Password
                 </label>
                 <input
@@ -307,7 +277,7 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter your password"
                   disabled={isSubmitting}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-theme bg-surface text-heading text-sm placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-[#DB9558] focus:border-[#DB9558] transition-all"
                 />
               </div>
             )}
@@ -332,8 +302,8 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
           </form>
 
           {/* Switch Tab Footer */}
-          <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700 text-center">
-            <p className="text-xs text-neutral-600 dark:text-neutral-300">
+          <div className="mt-6 pt-4 border-t border-theme text-center">
+            <p className="text-xs text-muted">
               {tab === 'signup' ? (
                 <>
                   Already have an account?{' '}
@@ -371,7 +341,7 @@ export const AuthGatewayScreen: React.FC<AuthGatewayScreenProps> = ({ theme = 'l
       </main>
 
       {/* Footer Info */}
-      <footer className="relative z-10 w-full max-w-4xl mx-auto py-2 text-center text-xs text-neutral-600 dark:text-neutral-400 border-t border-[#E3DCBE] dark:border-neutral-800 pt-3">
+      <footer className="relative z-10 w-full max-w-4xl mx-auto py-3 text-center text-[11px] sm:text-xs text-muted border-t border-theme pt-3">
         <p>&copy; {new Date().getFullYear()} Warung Pojok Aro &bull; Kleyang Jurang, Mojotengah, Wonosobo</p>
       </footer>
     </div>

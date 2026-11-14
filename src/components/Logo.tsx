@@ -67,15 +67,17 @@ export const Logo: React.FC<LogoProps> = ({
 
   // Default: Horizontal format (Logo di kiri, nama toko & slogan di kanan)
   return (
-    <div className={`group inline-flex items-center gap-2 sm:gap-2.5 text-heading min-w-0 ${className}`}>
+    <div className={`group inline-flex items-center gap-1.5 sm:gap-2.5 text-heading min-w-0 max-w-full ${className}`}>
       <LogoImage sizeClass={sizeClasses[size]} />
       <div className="flex flex-col justify-center leading-tight min-w-0">
-        <span className="font-bold tracking-tight text-heading text-xs xs:text-sm sm:text-base uppercase select-none truncate">
+        <span className={`font-bold tracking-tight text-heading uppercase select-none truncate ${
+          size === 'sm' ? 'text-[11px] sm:text-sm' : 'text-xs sm:text-base'
+        }`}>
           WARUNG POJOK ARO
         </span>
         {showSlogan && (
-          <span className="text-[9.5px] xs:text-[10px] sm:text-[11px] font-medium text-muted tracking-tight select-none mt-0.5 flex items-center gap-1.5 truncate">
-            <span className="font-semibold text-[#97A87A] dark:text-[#A8BBA3] shrink-0">
+          <span className="text-[10px] sm:text-[11px] font-medium text-muted tracking-tight select-none mt-0.5 flex items-center gap-1.5 truncate">
+            <span className="font-semibold text-[#A8BBA3] shrink-0">
               Toko Serba Ada
             </span>
             <span className="opacity-60 shrink-0">&bull;</span>
